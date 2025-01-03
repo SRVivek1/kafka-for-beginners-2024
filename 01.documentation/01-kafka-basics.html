@@ -503,39 +503,81 @@
 <ul>
 <li>The Serialization / Deserialization type must not change during a <code>Topic</code> lifecycle.</li>
 <li>If we need to change the Data type of a topic, we must create a new Topic and shared with details so consumers can make necessary changes to consume data from new Topic.</li>
-<li>Some takeaway:
-<ul>
-<li>Sub topic takeaway.</li>
-</ul>
-</li>
 </ul>
 </li>
 <li>
-<p><strong><ins>Pros &amp; Cons</ins></strong></p>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://www.geeksforgeeks.org/apache-kafka-serializer-and-deserializer/">https://www.geeksforgeeks.org/apache-kafka-serializer-and-deserializer/</a></li>
+<li><a href="https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups">https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups</a></li>
+</ul>
 </li>
 </ul>
-<table>
-<thead>
-<tr>
-<th>Pros</th>
-<th>Cons</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Pros 1</td>
-<td>Cons 1</td>
-</tr>
-<tr>
-<td>Pros 2</td>
-<td>Cons 2</td>
-</tr>
-</tbody>
-</table>
+<hr>
+<h2 id="xx-kafka---consumer-groups">XX. Kafka - Consumer groups</h2>
 <ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>A consumer group is a group of multiple consumers which visions to an application basically. Each consumer present in a group reads data directly from the exclusive partitions.
+<ul>
+<li>We can have multiple consumer groups on the same topic. and all consumers from these groups can read parallely from the Topic partitions.</li>
+<li><strong>Note:</strong> Only one consumer will be assigned to 1 partition but one consumer can read from multiple partitions.</li>
+</ul>
+</li>
+<li>In case, the number of consumers are more than the number of partitions, some of the consumers will be in an inactive state.
+<ul>
+<li>Somehow, if we lose any active consumer within the group then the inactive one can takeover and will come in an active state to read the data.</li>
+</ul>
+</li>
+<li>But, how to decide which consumer should read data first and from which partition ?
+<ul>
+<li>For such decisions, consumers within a group automatically use a <strong>GroupCoordinator</strong> and one <strong>ConsumerCoordinator</strong>, which assigns a consumer to a partition. This feature is already implemented in the Kafka.</li>
+</ul>
+</li>
+<li><strong>To Create disntinct consumer groups</strong> we'll use the consumer property <em><a href="http://group.id">group.id</a></em>.</li>
+<li><strong>Consumer Offsets:</strong>
+<ul>
+<li>Apache Kafka provides a convenient feature to store an offset value for a consumer group. It <em>stores an offset value</em> to know at which partition, the consumer group is reading the data.
+<ul>
+<li>As soon as a consumer in a group reads data, Kafka automatically commits the offsets, or it can be programmed.</li>
+<li>These offsets are committed live in a topic known as <em><strong>__consumer_offsets</strong></em> (<em>internal kafka topic</em>).</li>
+<li>This feature was implemented in the case of a machine failure where a consumer fails to read the data. So, the consumer will be able to continue reading from where it left off due to the commitment of the offset.</li>
+</ul>
+</li>
+<li><strong>Delivery Semantics for consumers</strong>
+<ul>
+<li>By default, Java consumers will automatically commits offset (at least once).</li>
+<li>There are 3 delivery semantics, if we choose to commit <em><strong>manually</strong></em>:
+<ul>
+<li><strong>At least once (usually preferred):</strong>
+<ul>
+<li>Offsets are commited after the message is processed. As if something goes wrong the mesage will be read again.</li>
+<li>This can result in duplicate processing of message. Hence ensure that our processing is idempotent (reprocessing the message won't impact the system).</li>
+</ul>
+</li>
+<li><strong>At most once:</strong>
+<ul>
+<li>Offsets are commited as soon as the message is received.</li>
+<li>If processing goes wrong, some message will be lost as they won't be read again.</li>
+</ul>
+</li>
+<li><strong>Exactly Once:</strong>
+<ul>
+<li>For Kafka to Kafka workflows, uses the transactional API (easy with Kafka Streams API)</li>
+<li>For Kafka to external system workflows, uses idempotent consumers.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li><strong><ins>References:</ins></strong>
 <ul>
-<li><a href="https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml">https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml</a></li>
+<li><a href="https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups">https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups</a></li>
 </ul>
 </li>
 </ul>

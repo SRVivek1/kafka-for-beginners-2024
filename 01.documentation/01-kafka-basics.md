@@ -198,18 +198,42 @@
 - **<ins>Notes:</ins>**
   - The Serialization / Deserialization type must not change during a `Topic` lifecycle.
   - If we need to change the Data type of a topic, we must create a new Topic and shared with details so consumers can make necessary changes to consume data from new Topic. 
-  - Some takeaway:
-    - Sub topic takeaway.
-
-- **<ins>Pros & Cons</ins>**
-
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
 
 - **<ins>References:</ins>**
-  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
+  - [https://www.geeksforgeeks.org/apache-kafka-serializer-and-deserializer/](https://www.geeksforgeeks.org/apache-kafka-serializer-and-deserializer/)
+  - [https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups](https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups)
+
+---
+
+## XX. Kafka - Consumer groups
+- **<ins>About / Introduction</ins>**
+  - A consumer group is a group of multiple consumers which visions to an application basically. Each consumer present in a group reads data directly from the exclusive partitions.
+    - We can have multiple consumer groups on the same topic. and all consumers from these groups can read parallely from the Topic partitions.
+    - **Note:** Only one consumer will be assigned to 1 partition but one consumer can read from multiple partitions.
+  - In case, the number of consumers are more than the number of partitions, some of the consumers will be in an inactive state. 
+    - Somehow, if we lose any active consumer within the group then the inactive one can takeover and will come in an active state to read the data.
+  - But, how to decide which consumer should read data first and from which partition ?
+    - For such decisions, consumers within a group automatically use a **GroupCoordinator** and one **ConsumerCoordinator**, which assigns a consumer to a partition. This feature is already implemented in the Kafka.
+  - **To Create disntinct consumer groups** we'll use the consumer property *group.id*.
+  - **Consumer Offsets:**
+    - Apache Kafka provides a convenient feature to store an offset value for a consumer group. It *stores an offset value* to know at which partition, the consumer group is reading the data. 
+      - As soon as a consumer in a group reads data, Kafka automatically commits the offsets, or it can be programmed. 
+      - These offsets are committed live in a topic known as ***__consumer_offsets*** (*internal kafka topic*). 
+      - This feature was implemented in the case of a machine failure where a consumer fails to read the data. So, the consumer will be able to continue reading from where it left off due to the commitment of the offset. 
+    - **Delivery Semantics for consumers**
+      - By default, Java consumers will automatically commits offset (at least once).
+      - There are 3 delivery semantics, if we choose to commit ***manually***:
+        - **At least once (usually preferred):**
+          - Offsets are commited after the message is processed. As if something goes wrong the mesage will be read again.
+          - This can result in duplicate processing of message. Hence ensure that our processing is idempotent (reprocessing the message won't impact the system). 
+        - **At most once:**
+          - Offsets are commited as soon as the message is received.
+          - If processing goes wrong, some message will be lost as they won't be read again.
+        - **Exactly Once:**
+          - For Kafka to Kafka workflows, uses the transactional API (easy with Kafka Streams API)
+          - For Kafka to external system workflows, uses idempotent consumers.
+- **<ins>References:</ins>**
+  - [https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups](https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups)
 
 ---
 
