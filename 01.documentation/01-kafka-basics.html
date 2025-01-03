@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Introdution to Kafka</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="introdution-to-kafka">Introdution to Kafka</h1>
+<h2 id="01-introduction-to-kafka-in-progress">01. Introduction to kafka [<em><strong>in progress</strong></em>]</h2>
+<ul>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
+<ul>
+<li>Apache Kafka is an open-source distributed event streaming platform used by thousands of companies for high-performance data pipelines, streaming analytics, data integration, and mission-critical applications.</li>
+<li>Created by <code>LinkedIn</code>,now mainly maintained by IBM, Cloudera, Confluent.</li>
+<li>Distributed, fault tolerant, resilient architecture.</li>
+<li><em><strong>Horizontal Scalability:</strong></em>
+<ul>
+<li>Can scale upto <em>100s of brokers</em>.</li>
+<li>Can scale to millions of messages per second.</li>
+</ul>
+</li>
+<li><strong>Core Capabilities:</strong>
+<ul>
+<li><em><strong>High Throughput:</strong></em>
+<ul>
+<li>Deliver messages at network limited throughput using a cluster of machines with latencies as low as 2ms.</li>
+</ul>
+</li>
+<li><em><strong>Scalable:</strong></em>
+<ul>
+<li>Scale production clusters up to a thousand brokers, trillions of messages per day, petabytes of data, hundreds of thousands of partitions. Elastically expand and contract storage and processing.</li>
+</ul>
+</li>
+<li><em><strong>Permanent storage:</strong></em>
+<ul>
+<li>Store streams of data safely in a distributed, durable, fault-tolerant cluster.</li>
+</ul>
+</li>
+<li><em><strong>High availability:</strong></em>
+<ul>
+<li>Stretch clusters efficiently over availability zones or connect separate clusters across geographic regions.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Ecosystem:</strong>
+<ul>
+<li><em><strong>Built-in Stream Processing:</strong></em>
+<ul>
+<li>Process streams of events with joins, aggregations, filters, transformations, and more, using event-time and exactly-once processing.</li>
+</ul>
+</li>
+<li><em><strong>Connect To Almost Anything:</strong></em>
+<ul>
+<li>Kafka’s out-of-the-box Connect interface integrates with hundreds of event sources and event sinks including Postgres, JMS, Elasticsearch, AWS S3, and more.</li>
+</ul>
+</li>
+<li><em><strong>Client Libraries:</strong></em>
+<ul>
+<li>Read, write, and process streams of events in a vast array of programming languages.</li>
+</ul>
+</li>
+<li><em><strong>Large Ecosystem Open Source Tools:</strong></em>
+<ul>
+<li>Large ecosystem of open source tools: Leverage a vast array of community-driven tooling.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Trust &amp; Ease Of Use:</strong>
+<ul>
+<li><em><strong>Mission Critical:</strong></em>
+<ul>
+<li>Support mission-critical use cases with guaranteed ordering, zero message loss, and efficient exactly-once processing.</li>
+</ul>
+</li>
+<li><em><strong>Trusted By Thousands of Orgs:</strong></em>
+<ul>
+<li>Thousands of organizations use Kafka, from internet giants to car manufacturers to stock exchanges. More than 5 million unique lifetime downloads.</li>
+</ul>
+</li>
+<li><em><strong>Vast User Community:</strong></em>
+<ul>
+<li>Kafka is one of the five most active projects of the Apache Software Foundation, with hundreds of meetups around the world.</li>
+</ul>
+</li>
+<li><em><strong>Rich Online Resources:</strong></em>
+<ul>
+<li>Rich documentation, online training, guided tutorials, videos, sample projects, Stack Overflow, etc.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Use cases:</strong>
+<ul>
+<li><em>Messaging System</em></li>
+<li><em>Activity tracking</em></li>
+<li><em>Gather matrics from many different locations</em></li>
+<li><em>Application logs gathering</em> (first use case of kafak)</li>
+<li><em>Stream processing</em> (Using kafka stream API)</li>
+<li><em>Decouple system dependency</em></li>
+<li><em>Integration with Spark, Hadoop, Flink, Storm and many other BigData technologies.</em></li>
+<li><em>Microservices pub-sub</em></li>
+</ul>
+</li>
+<li><strong>Applications:</strong>
+<ul>
+<li><em><strong>Netflix:</strong></em> Apply recommendations in real-time while user watches the shows.</li>
+<li><em><strong>Uber:</strong></em> Collect User, Cab &amp; trip data in realtime to forecast demand and compute surge pricing.</li>
+<li><em><strong>LinkedIn:</strong></em> Prevent spam &amp; collect user interactions to make better connection recommendataions in realtime.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://kafka.apache.org/">https://kafka.apache.org/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="1-kafka-topics-partitions-and-offsets">1. Kafka Topics, partitions and offsets</h2>
+<ul>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
+<ul>
+<li><em><strong>Kafka Topics</strong></em> are a particular stream of data inside kafka cluster. In a cluster we can have many topics e.g. - logs, purchases, twitter_tweets, trucks_gps and so on.
+<ul>
+<li>We can think of a Topic as a table in database but without all the constraints. But we can't query topics.</li>
+<li>Instead, we use <code>Kafka Producers</code> to send data and <code>Kafka Consumers</code> to receive data.</li>
+</ul>
+</li>
+<li>We can as much as Topic in kafka cluster, it can be identified by it's name.</li>
+<li>Kafak Topics support any kind of message formats e.g. JSON, Avro, Text file, binary etc..</li>
+<li>The squence of messages is called Data Stream.</li>
+<li><strong>Partitions and offset:</strong>
+<ul>
+<li>Topics are split in partitions (eg. 100 partitions).</li>
+<li>Messages sent to Kafka Topic will endup in these partitions and message within each partition is going to be ordered.
+<ul>
+<li>Data is assigned randomly to a partition unless a key is provided (more on this later).</li>
+<li>All the messages in partitions are assigned an message ID (aka Offset) (autoincrement 0,1,2,3,4,.....).</li>
+<li>The message ID is assigned at the <code>Partition Level</code>. Each partition maintains it's own independent sequence of <code>offsets</code>, starting <code>0</code>. Thesse offsets are unique only within the given partition. Other partitions can also have same offset.</li>
+<li>Offsets are not reused even if the message is removed from the partition.</li>
+</ul>
+</li>
+<li>When consuming a message combination of partition_number and the offset is used to uniquely identify a message in a topic.</li>
+<li>Consumers track offsets independenctly for each partition they consume from.</li>
+</ul>
+</li>
+<li><em><strong>Kafka Topics are immutable:</strong></em> Once the data is written to a partition, it can't be updated or deleted.</li>
+<li><em><strong>Data Storage:</strong></em> Data is kept only for a limited time (default is one week - configurable)</li>
+<li><strong>Message ordering:</strong> Order of messsages is guaranteed only within a partition but not accross the partitions.
+<ul>
+<li>Here message ordering means reading messages in ordered sequence as per offset number.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://developer.confluent.io/courses/apache-kafka/producers/?utm_medium=sem&amp;utm_source=google&amp;utm_campaign=ch.sem_br.nonbrand_tp.prs_tgt.dsa_mt.dsa_rgn.india_lng.eng_dv.all_con.confluent-developer&amp;utm_term=&amp;creative=&amp;device=c&amp;placement=&amp;gad_source=1&amp;gclid=Cj0KCQiAj9m7BhD1ARIsANsIIvDL5iHFIKlmflFV-JZ0nsPa-33AVBuBxRBlnagQtFar5bgoO0Eygz8aAvm7EALw_wcB">https://developer.confluent.io/courses/apache-kafka/producers/?utm_medium=sem&amp;utm_source=google&amp;utm_campaign=ch.sem_br.nonbrand_tp.prs_tgt.dsa_mt.dsa_rgn.india_lng.eng_dv.all_con.confluent-developer&amp;utm_term=&amp;creative=&amp;device=c&amp;placement=&amp;gad_source=1&amp;gclid=Cj0KCQiAj9m7BhD1ARIsANsIIvDL5iHFIKlmflFV-JZ0nsPa-33AVBuBxRBlnagQtFar5bgoO0Eygz8aAvm7EALw_wcB</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-kafka---producers-and-message-keys">2. Kafka - Producers and message keys</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li><strong>Kafka Producer:</strong>
+<ul>
+<li>A producer is the one which publishes or writes data to the topics within different partitions.</li>
+<li>Producers knows / decides that, what data should be written to which partition and broker (server). The user does not require to specify the broker and the partition.</li>
+<li>In case of Kafka broker failures, Producers will automatically recover.</li>
+<li><strong>Strategies:</strong>
+<ul>
+<li>A producer uses following strategie//s to write data to the cluster:
+<ul>
+<li><em>Message Keys</em></li>
+<li><em>Acknowledgement</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Message Keys:</strong>
+<ul>
+<li>Apache Kafka enables the concept of the key to send the messages in a specific order in specific partition.</li>
+<li>The Key enables the producer with two choices, i.e., either to send data to each partition (automatically) or send data to a specific partition only. Sending data to some specific partitions is possible with the message keys.</li>
+<li>If the producers apply key over the data, that data will always be sent to the same partition always. But, if the producer does not apply the key while writing the data, it will be sent in a round-robin manner. This process is called load balancing.</li>
+<li>In Kafka, load balancing is done when the producer writes data to the Kafka topic without specifying any key, Kafka distributes little-little bit data to each partition.</li>
+<li>There are two ways to know that the data is sent with or without a key:
+<ul>
+<li><em><strong>If the value of key=NULL:</strong></em>
+<ul>
+<li>It means that the data is sent without a key. Thus, it will be distributed in a round-robin manner (i.e., distributed to each partition).</li>
+</ul>
+</li>
+<li><em><strong>If the value of the key!=NULL:</strong></em>
+<ul>
+<li>It means the key is attached with the data, and thus all messages will always be delivered to the same partition (Hashing).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Typical message in kafka:<table style="border: 1px solid black">
+  <tr>
+    <td>
+      Key-Binary <br/>
+      (can be null)
+      </td>
+    <td>
+      Value-Binary <br/>
+      (can be null)
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      Compression type <br/> 
+      (none, gzip, snappy, lz4, zstd)
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      Headers (Optional) <br/> 
+      <p> 
+      |-----------------| <br/>
+      | Key &nbsp;&nbsp;| value &nbsp;&nbsp; |<br/>
+      |-----------------| <br/>
+      | Key &nbsp;&nbsp;| value &nbsp;&nbsp; |<br/>
+      |-----------------| <br/>
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      Partition + Offset
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      Timestamp (System or user set)
+    </td>
+  </tr>
+</table>
+</li>
+</ul>
+</li>
+<li><strong>Acknowledgment:</strong>
+<ul>
+<li>In this strategy, the producer can get a confirmation of its data writes by receiving the following acknowledgments:
+<ul>
+<li><em><strong>acks=0:</strong></em>
+<ul>
+<li>This means that the producer sends the data to the broker but does not wait for the acknowledgement.</li>
+<li>This leads to possible data loss because without confirming that the data is successfully sent to the broker or may be the broker is down, it sends another one.</li>
+</ul>
+</li>
+<li><em><strong>acks=1:</strong></em>
+<ul>
+<li>This means that the producer will wait for the leader's acknowledgement.</li>
+<li>The leader asks the broker whether it successfully received the data, and then returns feedback to the producer. In such case, there is limited data loss only.</li>
+</ul>
+</li>
+<li><em><strong>acks=all:</strong></em>
+<ul>
+<li>Here, the acknowledgment is done by both the leader and its followers.</li>
+<li>When they successfully acknowledge the data, it means the data is successfully received. In this case, there is no data loss.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Message Serializer:</strong>
+<ul>
+<li>Kafka only accepts <code>bytes</code> as input from <code>Producers</code> and sends only <code>bytes</code> as output to <code>Consumers</code>.</li>
+<li>Message Serialization means transforming objects/data into bytes.
+<ul>
+<li>The serialization is used only on the value and the key.</li>
+<li>It uses the Serializers provided <strong>KeySerializer</strong> &amp; <strong>ValueSerializer</strong> serialize the corresponding data.
+<ul>
+<li><strong>Serializers:</strong> <code>IntegerSerializer</code>, <code>StringSerializer</code> etc.</li>
+<li>e.g.
+<ul>
+<li><strong>Key Object is 123</strong> =&gt; <em>KeySerializer=IntegerSerializer</em></li>
+<li><strong>Value Object is 'Hello world'</strong>  =&gt; <em>ValueSerializer=StringSerializer</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Common Serializers:</strong>
+<ul>
+<li><em>String (including JSON)</em></li>
+<li><em>Int, Float</em></li>
+<li><em>Avro</em></li>
+<li><em>Protobuf</em></li>
+</ul>
+</li>
+<li><strong>Kafka Message Key Hashing:</strong>
+<ul>
+<li>A <strong>Kafka Partitioner</strong> is a code logic that takes a record / message and determines to which partition to send the record to.</li>
+<li>The it uses key hashing to determine the partition.</li>
+<li>By default <em>kafka partitioner</em> uses <strong>murmur2 algorithm</strong> as below.
+<ul>
+<li><code>targetPartition = Math.abs(Utils.murmur2(keyBytes)) % (numPartitions - 1)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://www.javatpoint.com/apache-kafka-producer">https://www.javatpoint.com/apache-kafka-producer</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>
