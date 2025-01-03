@@ -80,7 +80,7 @@
 
 ---
 
-## 2. Kafka - Producers and message keys
+## 2. Kafka - Producers, message keys and Serialization
 - **<ins>About / Introduction</ins>**
   - **Kafka Producer:**
     - A producer is the one which publishes or writes data to the topics within different partitions.
@@ -176,4 +176,40 @@
 
 ---
 
+## 3. Kafka Consumer and Deserialization
+- **<ins>About / Introduction</ins>**
+  - **Kafka Consumers** is used to reading data from a topic (pull model) and remember a topic again is identified by its name. So the consumers are smart enough and they will know which broker to read from and which partitions to read from. 
+    - In case of broker failures, the consumers know how to recover and this is resiiency property of Apache Kafka. 
+    - A consumer can read data from more than one partions / brokers. They know in advance that from which broker / parition they need to read data from and also in case of broker failures, they know how to recover data.
+    - Data is read from low to high offset within each partition.
+  - **Consumer Deserialization:**
+    - Deserialization is the process of transformating bytes into objects / data. This is used on the key and the value of the message.
+    - It uses the Serializers provided by **KeyDeserializer** & **ValueDeserializer** to deserialize the key and the value.
+      - **Serializers:** `IntegerSerializer`, `StringSerializer` etc.
+        - e.g. 
+          - **Key Object is 123** => *KeySerializer=IntegerSerializer*
+          - **Value Object is 'Hello world'**  => *ValueSerializer=StringSerializer*
+    - **Common Serializers:**
+      - *String (including JSON)*
+      - *Int, Float*
+      - *Avro*
+      - *Protobuf*
+
+- **<ins>Notes:</ins>**
+  - The Serialization / Deserialization type must not change during a `Topic` lifecycle.
+  - If we need to change the Data type of a topic, we must create a new Topic and shared with details so consumers can make necessary changes to consume data from new Topic. 
+  - Some takeaway:
+    - Sub topic takeaway.
+
+- **<ins>Pros & Cons</ins>**
+
+| Pros | Cons |
+| ---- | ---- |
+| Pros 1 | Cons 1 |
+| Pros 2 | Cons 2 |
+
+- **<ins>References:</ins>**
+  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
+
+---
 

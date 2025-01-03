@@ -298,7 +298,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="2-kafka---producers-and-message-keys">2. Kafka - Producers and message keys</h2>
+<h2 id="2-kafka---producers-message-keys-and-serialization">2. Kafka - Producers, message keys and Serialization</h2>
 <ul>
 <li><strong><ins>About / Introduction</ins></strong>
 <ul>
@@ -453,6 +453,89 @@
 <li><strong><ins>References:</ins></strong>
 <ul>
 <li><a href="https://www.javatpoint.com/apache-kafka-producer">https://www.javatpoint.com/apache-kafka-producer</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-kafka-consumer-and-deserialization">3. Kafka Consumer and Deserialization</h2>
+<ul>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
+<ul>
+<li><strong>Kafka Consumers</strong> is used to reading data from a topic (pull model) and remember a topic again is identified by its name. So the consumers are smart enough and they will know which broker to read from and which partitions to read from.
+<ul>
+<li>In case of broker failures, the consumers know how to recover and this is resiiency property of Apache Kafka.</li>
+<li>A consumer can read data from more than one partions / brokers. They know in advance that from which broker / parition they need to read data from and also in case of broker failures, they know how to recover data.</li>
+<li>Data is read from low to high offset within each partition.</li>
+</ul>
+</li>
+<li><strong>Consumer Deserialization:</strong>
+<ul>
+<li>Deserialization is the process of transformating bytes into objects / data. This is used on the key and the value of the message.</li>
+<li>It uses the Serializers provided by <strong>KeyDeserializer</strong> &amp; <strong>ValueDeserializer</strong> to deserialize the key and the value.
+<ul>
+<li><strong>Serializers:</strong> <code>IntegerSerializer</code>, <code>StringSerializer</code> etc.
+<ul>
+<li>e.g.
+<ul>
+<li><strong>Key Object is 123</strong> =&gt; <em>KeySerializer=IntegerSerializer</em></li>
+<li><strong>Value Object is 'Hello world'</strong>  =&gt; <em>ValueSerializer=StringSerializer</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Common Serializers:</strong>
+<ul>
+<li><em>String (including JSON)</em></li>
+<li><em>Int, Float</em></li>
+<li><em>Avro</em></li>
+<li><em>Protobuf</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>The Serialization / Deserialization type must not change during a <code>Topic</code> lifecycle.</li>
+<li>If we need to change the Data type of a topic, we must create a new Topic and shared with details so consumers can make necessary changes to consume data from new Topic.</li>
+<li>Some takeaway:
+<ul>
+<li>Sub topic takeaway.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Pros &amp; Cons</ins></strong></p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pros 1</td>
+<td>Cons 1</td>
+</tr>
+<tr>
+<td>Pros 2</td>
+<td>Cons 2</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml">https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml</a></li>
 </ul>
 </li>
 </ul>
