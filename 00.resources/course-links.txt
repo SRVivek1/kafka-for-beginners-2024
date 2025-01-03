@@ -1,0 +1,11 @@
+Course Code:
+-------------
+    --> https://conduktor.io/apache-kafka-for-beginners
+
+First part of the code:
+------------------------
+    --> https://raw.githubusercontent.com/conduktor/conduktor.io-public/main/kafka-for-beginners-code-20230404.zip
+
+Second part of code (Github):
+--------------------------------
+    --> https://github.com/conduktor/kafka-beginners-course
