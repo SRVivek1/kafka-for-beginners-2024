@@ -25,6 +25,10 @@
       - Read, write, and process streams of events in a vast array of programming languages.
     - ***Large Ecosystem Open Source Tools:***
       - Large ecosystem of open source tools: Leverage a vast array of community-driven tooling.
+    - ***Typical Kafka Ecosystem***
+    <center>
+      <img src="./images/kafka-ecosystem.png" alt="kafka ecosystem" title="Typical kafka ecosystem" width="900" height="400"/>
+    </center>
   - **Trust & Ease Of Use:**
     - ***Mission Critical:***
       - Support mission-critical use cases with guaranteed ordering, zero message loss, and efficient exactly-once processing.
@@ -194,7 +198,6 @@
       - *Int, Float*
       - *Avro*
       - *Protobuf*
-
 - **<ins>Notes:</ins>**
   - The Serialization / Deserialization type must not change during a `Topic` lifecycle.
   - If we need to change the Data type of a topic, we must create a new Topic and shared with details so consumers can make necessary changes to consume data from new Topic. 
@@ -300,7 +303,7 @@
     - To remove such confusion, the following task is done by Kafka:
       - It chooses one of the broker's partition as a leader, and the rest of them becomes its followers. At any time only one broker can be the partition leader.
         - **Producers** can only send data to the broker that is leader of a partition.
-      - The followers(brokers) will be allowed to synchronize the data. But, in the presence of a leader, none of the followers is allowed to serve the client's request. These replicas are known as ISR(in-sync-replica). So, Apache Kafka offers multiple **ISR (in-sync-replica)** for the data.
+      - The followers(brokers) will be allowed to synchronize the data. But, in the presence of a leader, none of the followers is allowed to serve the clien t's request. These replicas are known as ISR(in-sync-replica). So, Apache Kafka offers multiple **ISR (in-sync-replica)** for the data.
     - Therefore, only the leader is allowed to serve the client request. The leader handles all the read and writes operations of data for the partitions. The leader and its followers are determined by the zookeeper.
   - **Consumers: Replica fetching:**
     - Since Kafka 2.4+, it's possible to configure consumers to read data from closest  replica.
@@ -310,13 +313,38 @@
 
 ---
 
-## 6. xxxxxx
-- **<ins>Features</ins>**
-  - **Replica fetching:**
-    - Since Kafka 2.4+, it's possible to configure consumers to read data from closest  replica.
-    - This may help to reduce the latency and also decrease network costs if using cloud (if broker replica is in same data center).
-> Note: This is an ***important*** note.
+## 6. Kafka: Zookeeper
+- **<ins>About / Introduction</ins>**
+  - A ZooKeeper is used to store information about the Kafka cluster and details of the consumer clients. It manages brokers by maintaining a list of them. 
+    - Also, a ZooKeeper is responsible for choosing a leader for the partitions. 
+    - It doesn't store consumer offsets starting Kafka > v0.10.
+  - If any changes like a broker die, new topics, etc., occurs, the ZooKeeper sends notifications to Apache Kafka. 
+  - For reliable ZooKeeper service, you should deploy ZooKeeper in a cluster(multi-server) known as an ensemble. As long as a majority of the ensemble are up, the service will be available. 
+  - A ZooKeeper is designed to operate with an odd number of Kafka servers (1, 3, 5, 7 - Never more than 7 usually). Zookeeper has a leader server that handles all the writes, and rest of the servers are the followers who handle all the reads. 
+    - However, a user does not directly interact with the Zookeeper, but via brokers. 
+    - **Kafka 2.x** server can't run without a zookeeper server. It is ***mandatory to run the zookeeper server***.
+    - Now from **Kafka 3.x** it can run without a ***Zookeeper(KIP-500)*** server, using ***Kafka Raft (KRaft)*** instead.
+      - Kafka 3.3.1 (KIP-833) implements the Raft protocol (KRaft) in order to relace Zookeeper and is PROD ready.
+    - **Kafka 4.x** will be released only with KRaft (no Zookeeper).
+    - The reason of Zookeeper migration is it'sless secure than *Kafka*, and therefore Zookeeper ports should only be opened to allowed traffic from Kafka brokers and not from Kafka clients. 
+  - **KIP-500: (Replace ZooKeeper with a Self-Managed Metadata Quorum)** 
+    - The controller nodes comprise a Raft quorum which manages the metadata log. This log contains information about each change to the cluster metadata. Everything that is currently stored in ZooKeeper, such as topics, partitions, ISRs, configurations, and so on, will be stored in this log.
+    - Using the Raft algorithm, the controller nodes will elect a leader from amongst themselves, without relying on any external system. The leader of the metadata log is called the **active controller**. 
+      - The active controller handles all RPCs made from the brokers. The follower controllers replicate the data which is written to the active controller, and serve as hot standbys if the active controller should fail. Because the controllers will now all track the latest state, controller failover will not require a lengthy reloading period where we transfer all the state to the new controller.
+    - Just like ZooKeeper, Raft requires a majority of nodes to be running in order to continue running.
+      - Therefore, a three-node controller cluster can survive one failure.
+      - A five-node controller cluster can survive two failures, and so on.
+    - Periodically, the controllers will write out a snapshot of the metadata to disk. While this is conceptually similar to compaction, the code path will be a bit different because we can simply read the state from memory rather than re-reading the log from disk.
+- **<ins>Note:</ins>**
+  - **With Kafka Client?**
+    - Overtime, the Kafka clients and CLI have been migrated to *leverage the brokers as a connection endpoint* instead of Zookeeper.
+    - Since **Kafka 0.10**, consumers store offset Kafka & Zookeeper, and *must not connect to Zookeeper as it's deprecated.*
+    - Since, **Kafka 2.2**, the *kafka-topics.sh* references *Kafka Brokers* and not Zookeeper for topic management (creation, deletion, ... etc) and Zoookeeper CLI argument is deprecated.
+      - All the APIs and Commands that were previously leveraging Zookeeper are migrated to use Kafaka instead, so that when clusters are migrated to be without Zookeeper, the change is invisible to the clients.
+      -  
 - **<ins>References:</ins>**
-  - [https://www.javatpoint.com/kafka-topic-replication](https://www.javatpoint.com/kafka-topic-replication)
-
+  - [https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum](https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum)
+  - [https://zookeeper.apache.org/doc/r3.3.3/zookeeperAdmin.html#:~:text=Because%20Zookeeper%20requires%20a%20majority,do%20not%20constitute%20a%20majority.](https://zookeeper.apache.org/doc/r3.3.3/zookeeperAdmin.html#:~:text=Because%20Zookeeper%20requires%20a%20majority,do%20not%20constitute%20a%20majority.)
+  - [Course Lecture](https://www.udemy.com/course/apache-kafka/learn/lecture/11566886?start=0#content)
+  - 
 ---
