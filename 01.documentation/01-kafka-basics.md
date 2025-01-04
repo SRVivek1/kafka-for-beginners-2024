@@ -1,5 +1,5 @@
 # Introdution to Kafka
-## 01. Introduction to kafka [***in progress***]
+## 01. Introduction to kafka
 - **<ins>About / Introduction</ins>**
   - Apache Kafka is an open-source distributed event streaming platform used by thousands of companies for high-performance data pipelines, streaming analytics, data integration, and mission-critical applications.
   - Created by `LinkedIn`,now mainly maintained by IBM, Cloudera, Confluent.
@@ -205,7 +205,7 @@
 
 ---
 
-## XX. Kafka - Consumer groups
+## 4. Kafka - Consumer groups
 - **<ins>About / Introduction</ins>**
   - A consumer group is a group of multiple consumers which visions to an application basically. Each consumer present in a group reads data directly from the exclusive partitions.
     - We can have multiple consumer groups on the same topic. and all consumers from these groups can read parallely from the Topic partitions.
@@ -237,3 +237,86 @@
 
 ---
 
+## 5. Kafka Brokers & Topics [***In progress***]
+- **<ins>About / Introduction</ins>**
+  - **Broker:**
+    - Also know as ***Bootstrap Server***, the Kafka broker can be defined as one of the core components of the Kafka architecture aka the Kafka server and a Kafka node. We define a Kafka cluster when there is more than one broker (servers) present. 
+    - Each broker in the cluster has its own ***unique number ID (integer)***.
+    - The Kafka broker is responsible for transferring the conversation that the publisher is pushing in the Kafka log commit and the subscriber shall be consuming these messages.
+      - It has also been seen that an individual broker can handle thousands of requests for reads and writes per second. When no performance impact is seen then every broker in the Kafka cluster can handle terabytes of messages.
+      - Also, the Kafka producers push a message to a broker, then the broker receives the data record and stores it. This stored data remains over the disk defined by a distinct offset. However, the partition, topic, and offset of a broker allow consumers to fetch messages.
+    - While the Kafka cluster consists of various brokers. Kafka cluster implements the Zookeeper for maintaining the state of the cluster. ZooKeeper also performs the broker leader election.
+    - Kafka Broker is structured as a KafkaServer, that is hosting various topics. The stated topics must be partitioned across the various brokers spread in a Kafka cluster. 
+      - The single broker is hosting the topic partitions for more than one topic, while a topic is partitioned for a single partition. 
+    - Some big clusters can have over 100 brokers.
+  - **Topics:**
+    - A topic is a logical channel or category to which messages (or records) are published. Producers send data to topics, and consumers subscribe to topics to consume the data. Topics allow Kafka to organize and manage streams of data in a structured way.
+      - **Terms:**
+        - **Data Streams:** 
+          - A topic represents a stream of records (messages), and these records are ordered within the topic.
+        - **Partitions:** 
+          - Each topic can be split into multiple partitions, which allow Kafka to scale horizontally. Each partition is an ordered log of records, and data within a partition is stored in a sequence. Partitions enable parallelism in Kafka, as producers can write to different partitions and consumers can read from them independently.
+        - **Producers and Consumers:**
+          - **Producers** write data to topics. They can specify the topic name when sending a message.
+          - **Consumers** subscribe to topics to receive data. They can consume messages from one or more partitions of a topic.
+        - **Log-based Storage:** 
+          - Topics are stored as logs, meaning records are kept for a specific retention period or until the storage limit is reached, allowing consumers to read messages at any time within the retention window.
+        - **Durability:** 
+          - Kafka topics are fault-tolerant. Messages are replicated across multiple brokers in the cluster, which ensures that data is available even in the event of node failures.
+        - **Scaling:** 
+          - Topics can scale based on the number of partitions. More partitions allow higher throughput and parallel consumption but may introduce complexity in managing the partitions and maintaining order across them.
+        - **Topic Naming:** 
+          - Topics are identified by unique names. Producers and consumers need to know the topic name to send and consume messages, respectively.
+  - **Kafaka Broker Discovery:**
+    - Refers to the process by which Kafka clients (producers, consumers, or other services) discover and connect to the available Kafka brokers in a Kafka cluster.
+    - Here's how Kafka broker discovery works:
+      - **Initial Connection to the Cluster:**
+        - When a Kafka client starts, it needs to connect to at least one broker in the cluster to get information about the rest of the brokers in the cluster.
+        - The client is typically provided with a list of initial brokers (a small set of brokers), which can be hardcoded in the configuration or passed dynamically. These brokers can be any brokers that are part of the Kafka cluster.
+      - **Metadata Fetch:**
+        - After the client connects to one of the initial brokers, it requests metadata information from that broker. 
+          - *The metadata includes:*
+          - A list of all available brokers in the cluster.
+          - The topics and partitions each broker is responsible for.
+          - Which broker is the leader for each partition (i.e., the broker that is actively accepting writes for that partition).
+      - **Updating Broker List:**
+        - Once the client receives the metadata information, it can update its internal list of brokers and cache that information.
+        - If a broker fails or new brokers are added, the client can periodically refresh the metadata to stay up-to-date with the cluster's state.
+      - **Handling Failures:**
+        - If the initial broker provided becomes unreachable or fails, the client can use the updated broker list to attempt connections to other brokers in the cluster.
+        - Kafka clients usually implement automatic failover by retrying connections to other brokers or automatically updating their metadata when necessary.
+> **Note:** After connecting to any Broker (called a bootstrap broker), client receives a metadata with list of all brokers and then it will be able to connected to the entire cluster/broker (Kaka clients hae smart mechanism for that)
+- **<ins>References:</ins>**
+  - [ChatGPT](ChatGPT)
+---
+## 6. Kafka Topic Replication Factors
+- **<ins>About / Introduction</ins>**
+  - Apache Kafka is a distributed software system in the Big Data world. Thus, for such a system, there is a requirement to have copies of the stored data. 
+    - In Kafka, each broker contains some sort of data. But, what if the broker or the machine fails down? The data will be lost. *Precautionary*, Apache Kafka **enables a feature of replication to secure data loss** even when a broker fails down. 
+    - To do so, a replication factor is created for the topics contained in any particular broker. 
+      - A replication factor is the number of copies of data over multiple brokers. The replication factor value should be greater than 1 always (PROD) (usually between 2 or 3, most commonly 3). 
+        - This helps to store a replica of the data in another broker from where the user can access it.
+    - It is obvious to have confusion when both the actual data and its replicas are present. The cluster may get confuse that which broker should serve the client request. 
+    - To remove such confusion, the following task is done by Kafka:
+      - It chooses one of the broker's partition as a leader, and the rest of them becomes its followers. At any time only one broker can be the partition leader.
+        - **Producers** can only send data to the broker that is leader of a partition.
+      - The followers(brokers) will be allowed to synchronize the data. But, in the presence of a leader, none of the followers is allowed to serve the client's request. These replicas are known as ISR(in-sync-replica). So, Apache Kafka offers multiple **ISR (in-sync-replica)** for the data.
+    - Therefore, only the leader is allowed to serve the client request. The leader handles all the read and writes operations of data for the partitions. The leader and its followers are determined by the zookeeper.
+  - **Consumers: Replica fetching:**
+    - Since Kafka 2.4+, it's possible to configure consumers to read data from closest  replica.
+    - This may help to reduce the latency and also decrease network costs if using cloud (if broker replica is in same data center).
+- **<ins>References:</ins>**
+  - [https://www.javatpoint.com/kafka-topic-replication](https://www.javatpoint.com/kafka-topic-replication)
+
+---
+
+## 6. xxxxxx
+- **<ins>Features</ins>**
+  - **Replica fetching:**
+    - Since Kafka 2.4+, it's possible to configure consumers to read data from closest  replica.
+    - This may help to reduce the latency and also decrease network costs if using cloud (if broker replica is in same data center).
+> Note: This is an ***important*** note.
+- **<ins>References:</ins>**
+  - [https://www.javatpoint.com/kafka-topic-replication](https://www.javatpoint.com/kafka-topic-replication)
+
+---
