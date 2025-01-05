@@ -9,3 +9,8 @@ First part of the code:
 Second part of code (Github):
 --------------------------------
     --> https://github.com/conduktor/kafka-beginners-course
+
+Kafka Setup
+--------------------------------
+    --> https://learn.conduktor.io/kafka/starting-kafka/
+
