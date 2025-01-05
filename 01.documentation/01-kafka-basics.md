@@ -217,7 +217,9 @@
     - Somehow, if we lose any active consumer within the group then the inactive one can takeover and will come in an active state to read the data.
   - But, how to decide which consumer should read data first and from which partition ?
     - For such decisions, consumers within a group automatically use a **GroupCoordinator** and one **ConsumerCoordinator**, which assigns a consumer to a partition. This feature is already implemented in the Kafka.
-  - **To Create disntinct consumer groups** we'll use the consumer property *group.id*.
+  - **To Create disntinct consumer groups** 
+    - we'll use the consumer property *group.id*.
+    - Two consumers that have the same group.id (consumer group id) will read from mutually exclusive partitions.
   - **Consumer Offsets:**
     - Apache Kafka provides a convenient feature to store an offset value for a consumer group. It *stores an offset value* to know at which partition, the consumer group is reading the data. 
       - As soon as a consumer in a group reads data, Kafka automatically commits the offsets, or it can be programmed. 

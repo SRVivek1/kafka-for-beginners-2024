@@ -200,7 +200,7 @@
 <li><em><strong>Typical Kafka Ecosystem</strong></em></li>
 </ul>
 <center>
-<img src="file:////home/srvivek/wrkspace/kafka-for-beginners-2024/01.documentation/images/kafka-ecosystem.png" alt="kafka ecosystem" title="Typical kafka ecosystem" width="900" height="400"/>
+  <img src="file:////home/srvivek/wrkspace/kafka-for-beginners-2024/01.documentation/images/kafka-ecosystem.png" alt="kafka ecosystem" title="Typical kafka ecosystem" width="900" height="400"/>
 </center>
 </li>
 <li><strong>Trust &amp; Ease Of Use:</strong>
@@ -538,7 +538,12 @@
 <li>For such decisions, consumers within a group automatically use a <strong>GroupCoordinator</strong> and one <strong>ConsumerCoordinator</strong>, which assigns a consumer to a partition. This feature is already implemented in the Kafka.</li>
 </ul>
 </li>
-<li><strong>To Create disntinct consumer groups</strong> we'll use the consumer property <em><a href="http://group.id">group.id</a></em>.</li>
+<li><strong>To Create disntinct consumer groups</strong>
+<ul>
+<li>we'll use the consumer property <em><a href="http://group.id">group.id</a></em>.</li>
+<li>Two consumers that have the same <a href="http://group.id">group.id</a> (consumer group id) will read from mutually exclusive partitions.</li>
+</ul>
+</li>
 <li><strong>Consumer Offsets:</strong>
 <ul>
 <li>Apache Kafka provides a convenient feature to store an offset value for a consumer group. It <em>stores an offset value</em> to know at which partition, the consumer group is reading the data.
