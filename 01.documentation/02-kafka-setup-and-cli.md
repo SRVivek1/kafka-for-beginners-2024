@@ -317,6 +317,8 @@
     - *Check section-4 for kafka producer and commands.*
   - ***Step-2:*** Kafka consumer to consume message in group
     - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application*
+    - **Note:** 
+      - If we will not provide the *--group xxxx* then a temproary consumer group is cretaed to consume the message and auto-removed later.
   - ***Step-3:*** Cretea another kafka consumer in same group
     - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application*
     - **Note:**
@@ -358,31 +360,111 @@
   - The Kafka Consumer Groups CLI kafka-consumer-groups is used to manage consumer groups in Kafka.
   - This tool helps to list all consumer groups, describe a consumer group, delete consumer group info, or reset consumer group offsets.
   - Generally, a Kafka consumer belongs to a particular consumer group. A consumer group basically represents the name of an application. In order to consume messages in a consumer group, '-group' command is used.
-  - **This is image**
+  - **A typical kafka consumer groups**
     <center>
       <img src="./images/kafka-consumer-groups-cli.png" alt="Kafka consumer groups CLI" title="Typical kafka consumer groups" width="600" height="270"/>
     </center>
 - **<ins>Steps</ins>**
   - ***Project Setup:*** *Zookeeper* and at least one *Kafka server* must be running.
-  - ***Step-1:*** Some change/step
-  - ***Step-2:*** Some change/step
-> Note: This is an ***important*** note.
-
+  - ***Step-1:*** List all consumers groups
+    - **Command:** *kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --list*
+  - ***Step-2:*** Get details (describe) a group
+    - **Command:** *kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application*
+    - **Response:** *Note: Only one consumer is running.*
+      - **LAG:** Unread messages in topic.
+    ```properties
+        GROUP                TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG    CONSUMER-ID                                           HOST             CLIENT-ID
+        my-first-application third_topic     2          13              15              2      console-consumer-5b341142-1f1a-4838-84e0-790690e71804 /0:0:0:0:0:0:0:1 console-consumer
+        my-first-application third_topic     1          13              14              1      console-consumer-5b341142-1f1a-4838-84e0-790690e71804 /0:0:0:0:0:0:0:1 console-consumer
+        my-first-application third_topic     0          13              15              2      console-consumer-5b341142-1f1a-4838-84e0-790690e71804 /0:0:0:0:0:0:0:1 console-consumer
+    ```
+  - ***Step-3:*** Describe members of the group.
+    - **Command:** *kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application --members*
+    - **Response:**
+    ```properties
+        GROUP                 CONSUMER-ID                                            HOST             CLIENT-ID        #PARTITIONS
+        my-first-application  console-consumer-5b341142-1f1a-4838-84e0-790690e71804  /0:0:0:0:0:0:0:1 console-consumer 3
+    ```
+  - ***Step-4*** Reset offset of a topic to the beginning. Ensure that *Consumers* are not running.
+    - **Command (Dry Run):** *kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --dry-run*
+      - **Response:**
+      ```properties
+          GROUP                  TOPIC           PARTITION   NEW-OFFSET     
+          my-first-application   third_topic     2           0              
+          my-first-application   third_topic     1           0              
+          my-first-application   third_topic     0           0            
+      ```
+    - **Command (Execute):** *kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --execute*
+      - **Response:** *No consumers are connected,to demonstrate the LAG*
+      ```properties
+          GROUP                 TOPIC         PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG   CONSUMER-ID   HOST  CLIENT-ID
+          my-first-application  third_topic   2          0               16              16    -             -     -
+          my-first-application  third_topic   1          0               15              15    -             -     -
+          my-first-application  third_topic   0          0               15              15    -             -     -
+      ```
 - **<ins>Notes:</ins>**
-  - Some important key point / takeaway note.
-  - Some takeaway:
-    - Sub topic takeaway.
+  - Kafka provides lot more options to reset the offset, check documentation for more details. 
+  - Here are some of flags for offset reset.
+    - **--to-current:** *Reset offsets to current offset.*
+    - **--to-datetime <String: datetime>:** *Reset offsets to offset from datetime. Format: 'YYYY-MM-DDTHH:mm:SS.sss'*
+    - **--to-earliest:** *Reset offsets to earliest offset.*
+    - **--to-latest:** *Reset offsets to latest offset.*
+    - **--to-offset <Long: offset>:** *Reset offsets to a specific offset.*
+- **<ins>All Commands:</ins>**
+  ```sh
+      # documentation for the command 
+      kafka-consumer-groups.sh 
 
-- **<ins>Pros & Cons</ins>**
+      # list consumer groups
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --list
+      
+      # describe one specific group
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-second-application
 
-| Pros | Cons |
-| ---- | ---- |
-| Pros 1 | Cons 1 |
-| Pros 2 | Cons 2 |
+      # describe another group
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
 
+      # desriber members of the group
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application --members
+
+      # start a consumer
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --group my-first-application
+
+      # describe the group now
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+
+      # describe a console consumer group (change the end number)
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group console-consumer-10592
+
+      # start a console consumer
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --group my-first-application
+
+      # describe the group again
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+
+
+      #############################
+      ######  Reset offset   ######
+      #############################
+
+      # Dry Run: reset the offsets to the beginning of each partition
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --dry-run
+
+      # execute flag is needed
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --execute
+
+      # describe the consumer group again
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+
+      # consume from where the offsets have been reset
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application
+
+      # describe the group again
+      kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+  ```
 - **<ins>References:</ins>**
-  - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
-
+  - [https://www.javatpoint.com/kafka-consumer-group-cli](https://www.javatpoint.com/kafka-consumer-group-cli)
+  - [https://learn.conduktor.io/kafka/kafka-consumer-group-management-cli-tutorial/](https://learn.conduktor.io/kafka/kafka-consumer-group-management-cli-tutorial/)
 ---
 
 
