@@ -187,7 +187,16 @@
       <center>
         <img src="./images/kafka-console-producer-cmd-with-keys.png" alt="kafka console producer command with keys" title="Typical kafka console producer command with keys" width="620" height="80"/>
       </center>
-> Note: Press ***Ctrl + C*** to exit the console.
+  - ***Step-4*** Produce data to all partitions with RoundRobin mechanism.
+    - **Command:** *kafka-console-producer.sh --bootstrap-server [::1]:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic first_topic*
+    - **Paritioner property:**
+      - *org.apache.kafka.clients.producer.RoundRobinPartitioner* class explicity specifies partitioning strategy to distribute the messages if there's more than one parititon.
+    - **Note:**
+      - Do not use in *PRODUCTION* environment, it's one of the most inefficient Partitioning stretegy.
+- **Note:** 
+  - Press ***Ctrl + C*** to exit the console.
+  - We must create topics with the appropriate number of partitions before producing to them.
+
 - **<ins>All Commands:</ins>**
   ```sh
       ############################
@@ -226,7 +235,6 @@
 
       # edit config/server.properties or config/kraft/server.properties
       # num.partitions=3
-
       # produce against a non existing topic again
       kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic new_topic_2
       hello again!
@@ -235,21 +243,148 @@
       kafka-topics.sh --bootstrap-server [::1]:9092 --list
       kafka-topics.sh --bootstrap-server [::1]:9092 --topic new_topic_2 --describe
 
-      # overall, please create topics with the appropriate number of partitions before producing to them!
-
-      # produce with keys
+      # produce messages with keys
       kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic first_topic --property parse.key=true --property key.separator=:
       >key1:value1
       >name:srvivek
   ```
+- **<ins>References:</ins>**
+  - [https://learn.conduktor.io/kafka/kafka-producer-cli-tutorial/](https://learn.conduktor.io/kafka/kafka-producer-cli-tutorial/)
+  - [https://www.javatpoint.com/sending-data-to-kafka-topics](https://www.javatpoint.com/sending-data-to-kafka-topics)
+  - [https://docs.confluent.io/kafka/operations-tools/kafka-tools.html](https://docs.confluent.io/kafka/operations-tools/kafka-tools.html)
+  
+---
+## 5. Kafka Console Consumer *kafka-console-consumer.sh*
+- **<ins>About / Introduction</ins>**
+  - Consume data using *kafka-console-consumer.sh* executable/script. 
+  - **Typical kafka consumers**
+    <center>
+      <img src="./images/kafka-console-consumer.png" alt="Typical kafka consumer" title="Typical kafka consumer" width="700" height="270"/>
+    </center>
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** *Zookeeper* and at least one *Kafka server* must be running.
+  - ***Step-1:*** Create topic if doesn't exist and produce message to the topic.
+    - *Check section-4 for kafka producer and commands.*
+  - ***Step-2:*** Kafka consumer to consume message.
+    - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic*
+  - ***Step-3:*** Consume message from beginning
+    - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --from-beginning*
+    - **Note:**
+      - The message ordering will not be same as produced as messages will be read from all partitions independently.
+  - ***Step-4:*** Consume message and print message metadata (from beginning)
+    - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --from-beginning*
+- **<ins>All Commands</ins>**
+  ```sh
+      ############################
+      #####     LOCALHOST    #####
+      ############################
+
+      # create a topic with 3 partitions
+      kafka-topics.sh --bootstrap-server [::1]:9092 --topic first_topic --create --partitions 3
+
+      # consuming new messages
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic
+
+      # producing other terminal
+      # RoundRobin to all partitions
+      kafka-console-producer.sh --bootstrap-server [::1]:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic first_topic
+
+      # consuming messages from beginning
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --from-beginning
+
+      # consume messages and display key, values and timestamp in consumer
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --from-beginning
+  ```
+- **<ins>References:</ins>**
+  - [https://learn.conduktor.io/kafka/kafka-consumer-cli-tutorial/](https://learn.conduktor.io/kafka/kafka-consumer-cli-tutorial/)
+  - [https://www.javatpoint.com/kafka-console-consumer](https://www.javatpoint.com/kafka-console-consumer)
+  - [https://docs.confluent.io/kafka/operations-tools/kafka-tools.html](https://docs.confluent.io/kafka/operations-tools/kafka-tools.html)
+---
+
+## 6. Kafka Console Consumer in Gropus *kafka-console-consumer.sh*
+- **<ins>About / Introduction</ins>**
+  - Consume data using *kafka-console-consumer.sh* executable/script in consumer groups.
+  - **Note:**
+    - If consumers are less then partitions, then consumers can read from more than one parition.
+    - If consumers are more than parititions, then other consumers will be idle and will not consume data.
+  - **Typical kafka consumers**
+    <center>
+      <img src="./images/kafka-console-consumer-groups.png" alt="Typical kafka consumer groups" title="Typical kafka consumer groups" width="650" height="270"/>
+    </center>
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** *Zookeeper* and at least one *Kafka server* must be running.
+  - ***Step-1:*** Create new topic if doesn't exist or have 1 partition and produce message to the topic.
+    - *Check section-4 for kafka producer and commands.*
+  - ***Step-2:*** Kafka consumer to consume message in group
+    - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application*
+  - ***Step-3:*** Cretea another kafka consumer in same group
+    - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application*
+    - **Note:**
+      - If no consumers were up and we start the first consumer, it will read all unread/new the messages.
+      - We can have any number of consumers. 
+        - But one partition can read by only one consumer while a single consumer can read from multiple partitions, in case if consumers count is less then paritions count.
+        - If there are more consumers then other will be idle and will not consume any messsage.
+      - The message ordering will not be same as produced as messages will be read from all partitions independently.
+  - ***Step-4:*** Consume message in group and print message metadata
+    - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --group my-first-application*
+  - ***Step-5:*** To read message from beginning, we need to create a new group *my-second-application* for the topic.
+    - **Command:** *kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --group my-second-application --from-beginning*
+- **<ins>All Commands</ins>**
+  ```sh
+      # create a topic with 3 partitions
+      # If doesn't exists or have 1 partition
+      kafka-topics.sh --bootstrap-server [::1]:9092 --topic third_topic --create --partitions 3
+
+      # start one consumer
+      # It will not read old messages
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application
+
+      # start one producer and start producing
+      kafka-console-producer.sh --bootstrap-server [::1]:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic third_topic
+
+      # start another consumer part of the same group. See messages being spread
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application
+
+      # start another consumer part of a different group from beginning
+      kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-second-application --from-beginning
+  ```
+- **<ins>References:</ins>**
+  - [https://learn.conduktor.io/kafka/kafka-consumers-in-group-cli-tutorial/](https://learn.conduktor.io/kafka/kafka-consumers-in-group-cli-tutorial/)
+  - [https://www.javatpoint.com/kafka-consumer-group-cli](https://www.javatpoint.com/kafka-consumer-group-cli)
+---
+
+## 7. Kafka consumer group management *kafka-consumer-groups.sh*
+- **<ins>About / Introduction</ins>**
+  - The Kafka Consumer Groups CLI kafka-consumer-groups is used to manage consumer groups in Kafka.
+  - This tool helps to list all consumer groups, describe a consumer group, delete consumer group info, or reset consumer group offsets.
+  - Generally, a Kafka consumer belongs to a particular consumer group. A consumer group basically represents the name of an application. In order to consume messages in a consumer group, '-group' command is used.
+  - **This is image**
+    <center>
+      <img src="./images/kafka-consumer-groups-cli.png" alt="Kafka consumer groups CLI" title="Typical kafka consumer groups" width="600" height="270"/>
+    </center>
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** *Zookeeper* and at least one *Kafka server* must be running.
+  - ***Step-1:*** Some change/step
+  - ***Step-2:*** Some change/step
+> Note: This is an ***important*** note.
+
 - **<ins>Notes:</ins>**
   - Some important key point / takeaway note.
   - Some takeaway:
     - Sub topic takeaway.
+
+- **<ins>Pros & Cons</ins>**
+
+| Pros | Cons |
+| ---- | ---- |
+| Pros 1 | Cons 1 |
+| Pros 2 | Cons 2 |
+
 - **<ins>References:</ins>**
   - [https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml](https://github.com/springdoc/springdoc-openapi/blob/main/springdoc-openapi-starter-webmvc-ui/pom.xml)
 
 ---
+
 
 
 
