@@ -2,6 +2,10 @@
 - **<ins>About / Introduction</ins>**
   - This is abc feature.
   - This is xyz feature.
+  - **This is image**
+    <center>
+      <img src="https://kafka.apache.org/11/images/streams-architecture-overview.jpg" alt="kafka ecosystem" title="Typical kafka streams ecosystem" width="900" height="400"/>
+    </center>
 - **<ins>Steps</ins>**
   - ***Project Setup:*** Some change/step
   - ***Step-1:*** Some change/step

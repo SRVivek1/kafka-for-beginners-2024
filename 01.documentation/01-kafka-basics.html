@@ -137,7 +137,7 @@
         </head>
         <body class="vscode-body vscode-light">
             <h1 id="introdution-to-kafka">Introdution to Kafka</h1>
-<h2 id="01-introduction-to-kafka-in-progress">01. Introduction to kafka [<em><strong>in progress</strong></em>]</h2>
+<h2 id="01-introduction-to-kafka">01. Introduction to kafka</h2>
 <ul>
 <li>
 <p><strong><ins>About / Introduction</ins></strong></p>
@@ -197,7 +197,11 @@
 <li>Large ecosystem of open source tools: Leverage a vast array of community-driven tooling.</li>
 </ul>
 </li>
+<li><em><strong>Typical Kafka Ecosystem</strong></em></li>
 </ul>
+<center>
+  <img src="file:////home/srvivek/wrkspace/kafka-for-beginners-2024/01.documentation/images/kafka-ecosystem.png" alt="kafka ecosystem" title="Typical kafka ecosystem" width="900" height="400"/>
+</center>
 </li>
 <li><strong>Trust &amp; Ease Of Use:</strong>
 <ul>
@@ -298,7 +302,7 @@
 </li>
 </ul>
 <hr>
-<h2 id="2-kafka---producers-and-message-keys">2. Kafka - Producers and message keys</h2>
+<h2 id="2-kafka---producers-message-keys-and-serialization">2. Kafka - Producers, message keys and Serialization</h2>
 <ul>
 <li><strong><ins>About / Introduction</ins></strong>
 <ul>
@@ -453,6 +457,375 @@
 <li><strong><ins>References:</ins></strong>
 <ul>
 <li><a href="https://www.javatpoint.com/apache-kafka-producer">https://www.javatpoint.com/apache-kafka-producer</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-kafka-consumer-and-deserialization">3. Kafka Consumer and Deserialization</h2>
+<ul>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
+<ul>
+<li><strong>Kafka Consumers</strong> is used to reading data from a topic (pull model) and remember a topic again is identified by its name. So the consumers are smart enough and they will know which broker to read from and which partitions to read from.
+<ul>
+<li>In case of broker failures, the consumers know how to recover and this is resiiency property of Apache Kafka.</li>
+<li>A consumer can read data from more than one partions / brokers. They know in advance that from which broker / parition they need to read data from and also in case of broker failures, they know how to recover data.</li>
+<li>Data is read from low to high offset within each partition.</li>
+</ul>
+</li>
+<li><strong>Consumer Deserialization:</strong>
+<ul>
+<li>Deserialization is the process of transformating bytes into objects / data. This is used on the key and the value of the message.</li>
+<li>It uses the Serializers provided by <strong>KeyDeserializer</strong> &amp; <strong>ValueDeserializer</strong> to deserialize the key and the value.
+<ul>
+<li><strong>Serializers:</strong> <code>IntegerSerializer</code>, <code>StringSerializer</code> etc.
+<ul>
+<li>e.g.
+<ul>
+<li><strong>Key Object is 123</strong> =&gt; <em>KeySerializer=IntegerSerializer</em></li>
+<li><strong>Value Object is 'Hello world'</strong>  =&gt; <em>ValueSerializer=StringSerializer</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Common Serializers:</strong>
+<ul>
+<li><em>String (including JSON)</em></li>
+<li><em>Int, Float</em></li>
+<li><em>Avro</em></li>
+<li><em>Protobuf</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Notes:</ins></strong></p>
+<ul>
+<li>The Serialization / Deserialization type must not change during a <code>Topic</code> lifecycle.</li>
+<li>If we need to change the Data type of a topic, we must create a new Topic and shared with details so consumers can make necessary changes to consume data from new Topic.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://www.geeksforgeeks.org/apache-kafka-serializer-and-deserializer/">https://www.geeksforgeeks.org/apache-kafka-serializer-and-deserializer/</a></li>
+<li><a href="https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups">https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-kafka---consumer-groups">4. Kafka - Consumer groups</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>A consumer group is a group of multiple consumers which visions to an application basically. Each consumer present in a group reads data directly from the exclusive partitions.
+<ul>
+<li>We can have multiple consumer groups on the same topic. and all consumers from these groups can read parallely from the Topic partitions.</li>
+<li><strong>Note:</strong> Only one consumer will be assigned to 1 partition but one consumer can read from multiple partitions.</li>
+</ul>
+</li>
+<li>In case, the number of consumers are more than the number of partitions, some of the consumers will be in an inactive state.
+<ul>
+<li>Somehow, if we lose any active consumer within the group then the inactive one can takeover and will come in an active state to read the data.</li>
+</ul>
+</li>
+<li>But, how to decide which consumer should read data first and from which partition ?
+<ul>
+<li>For such decisions, consumers within a group automatically use a <strong>GroupCoordinator</strong> and one <strong>ConsumerCoordinator</strong>, which assigns a consumer to a partition. This feature is already implemented in the Kafka.</li>
+</ul>
+</li>
+<li><strong>To Create disntinct consumer groups</strong>
+<ul>
+<li>we'll use the consumer property <em><a href="http://group.id">group.id</a></em>.</li>
+<li>Two consumers that have the same <a href="http://group.id">group.id</a> (consumer group id) will read from mutually exclusive partitions.</li>
+</ul>
+</li>
+<li><strong>Consumer Offsets:</strong>
+<ul>
+<li>Apache Kafka provides a convenient feature to store an offset value for a consumer group. It <em>stores an offset value</em> to know at which partition, the consumer group is reading the data.
+<ul>
+<li>As soon as a consumer in a group reads data, Kafka automatically commits the offsets, or it can be programmed.</li>
+<li>These offsets are committed live in a topic known as <em><strong>__consumer_offsets</strong></em> (<em>internal kafka topic</em>).</li>
+<li>This feature was implemented in the case of a machine failure where a consumer fails to read the data. So, the consumer will be able to continue reading from where it left off due to the commitment of the offset.</li>
+</ul>
+</li>
+<li><strong>Delivery Semantics for consumers</strong>
+<ul>
+<li>By default, Java consumers will automatically commits offset (at least once).</li>
+<li>There are 3 delivery semantics, if we choose to commit <em><strong>manually</strong></em>:
+<ul>
+<li><strong>At least once (usually preferred):</strong>
+<ul>
+<li>Offsets are commited after the message is processed. As if something goes wrong the mesage will be read again.</li>
+<li>This can result in duplicate processing of message. Hence ensure that our processing is idempotent (reprocessing the message won't impact the system).</li>
+</ul>
+</li>
+<li><strong>At most once:</strong>
+<ul>
+<li>Offsets are commited as soon as the message is received.</li>
+<li>If processing goes wrong, some message will be lost as they won't be read again.</li>
+</ul>
+</li>
+<li><strong>Exactly Once:</strong>
+<ul>
+<li>For Kafka to Kafka workflows, uses the transactional API (easy with Kafka Streams API)</li>
+<li>For Kafka to external system workflows, uses idempotent consumers.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups">https://www.javatpoint.com/apache-kafka-consumer-and-consumer-groups</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-kafka-brokers--topics-in-progress">5. Kafka Brokers &amp; Topics [<em><strong>In progress</strong></em>]</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li><strong>Broker:</strong>
+<ul>
+<li>Also know as <em><strong>Bootstrap Server</strong></em>, the Kafka broker can be defined as one of the core components of the Kafka architecture aka the Kafka server and a Kafka node. We define a Kafka cluster when there is more than one broker (servers) present.</li>
+<li>Each broker in the cluster has its own <em><strong>unique number ID (integer)</strong></em>.</li>
+<li>The Kafka broker is responsible for transferring the conversation that the publisher is pushing in the Kafka log commit and the subscriber shall be consuming these messages.
+<ul>
+<li>It has also been seen that an individual broker can handle thousands of requests for reads and writes per second. When no performance impact is seen then every broker in the Kafka cluster can handle terabytes of messages.</li>
+<li>Also, the Kafka producers push a message to a broker, then the broker receives the data record and stores it. This stored data remains over the disk defined by a distinct offset. However, the partition, topic, and offset of a broker allow consumers to fetch messages.</li>
+</ul>
+</li>
+<li>While the Kafka cluster consists of various brokers. Kafka cluster implements the Zookeeper for maintaining the state of the cluster. ZooKeeper also performs the broker leader election.</li>
+<li>Kafka Broker is structured as a KafkaServer, that is hosting various topics. The stated topics must be partitioned across the various brokers spread in a Kafka cluster.
+<ul>
+<li>The single broker is hosting the topic partitions for more than one topic, while a topic is partitioned for a single partition.</li>
+</ul>
+</li>
+<li>Some big clusters can have over 100 brokers.</li>
+</ul>
+</li>
+<li><strong>Topics:</strong>
+<ul>
+<li>A topic is a logical channel or category to which messages (or records) are published. Producers send data to topics, and consumers subscribe to topics to consume the data. Topics allow Kafka to organize and manage streams of data in a structured way.
+<ul>
+<li><strong>Terms:</strong>
+<ul>
+<li><strong>Data Streams:</strong>
+<ul>
+<li>A topic represents a stream of records (messages), and these records are ordered within the topic.</li>
+</ul>
+</li>
+<li><strong>Partitions:</strong>
+<ul>
+<li>Each topic can be split into multiple partitions, which allow Kafka to scale horizontally. Each partition is an ordered log of records, and data within a partition is stored in a sequence. Partitions enable parallelism in Kafka, as producers can write to different partitions and consumers can read from them independently.</li>
+</ul>
+</li>
+<li><strong>Producers and Consumers:</strong>
+<ul>
+<li><strong>Producers</strong> write data to topics. They can specify the topic name when sending a message.</li>
+<li><strong>Consumers</strong> subscribe to topics to receive data. They can consume messages from one or more partitions of a topic.</li>
+</ul>
+</li>
+<li><strong>Log-based Storage:</strong>
+<ul>
+<li>Topics are stored as logs, meaning records are kept for a specific retention period or until the storage limit is reached, allowing consumers to read messages at any time within the retention window.</li>
+</ul>
+</li>
+<li><strong>Durability:</strong>
+<ul>
+<li>Kafka topics are fault-tolerant. Messages are replicated across multiple brokers in the cluster, which ensures that data is available even in the event of node failures.</li>
+</ul>
+</li>
+<li><strong>Scaling:</strong>
+<ul>
+<li>Topics can scale based on the number of partitions. More partitions allow higher throughput and parallel consumption but may introduce complexity in managing the partitions and maintaining order across them.</li>
+</ul>
+</li>
+<li><strong>Topic Naming:</strong>
+<ul>
+<li>Topics are identified by unique names. Producers and consumers need to know the topic name to send and consume messages, respectively.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Kafaka Broker Discovery:</strong>
+<ul>
+<li>Refers to the process by which Kafka clients (producers, consumers, or other services) discover and connect to the available Kafka brokers in a Kafka cluster.</li>
+<li>Here's how Kafka broker discovery works:
+<ul>
+<li><strong>Initial Connection to the Cluster:</strong>
+<ul>
+<li>When a Kafka client starts, it needs to connect to at least one broker in the cluster to get information about the rest of the brokers in the cluster.</li>
+<li>The client is typically provided with a list of initial brokers (a small set of brokers), which can be hardcoded in the configuration or passed dynamically. These brokers can be any brokers that are part of the Kafka cluster.</li>
+</ul>
+</li>
+<li><strong>Metadata Fetch:</strong>
+<ul>
+<li>After the client connects to one of the initial brokers, it requests metadata information from that broker.
+<ul>
+<li><em>The metadata includes:</em></li>
+<li>A list of all available brokers in the cluster.</li>
+<li>The topics and partitions each broker is responsible for.</li>
+<li>Which broker is the leader for each partition (i.e., the broker that is actively accepting writes for that partition).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Updating Broker List:</strong>
+<ul>
+<li>Once the client receives the metadata information, it can update its internal list of brokers and cache that information.</li>
+<li>If a broker fails or new brokers are added, the client can periodically refresh the metadata to stay up-to-date with the cluster's state.</li>
+</ul>
+</li>
+<li><strong>Handling Failures:</strong>
+<ul>
+<li>If the initial broker provided becomes unreachable or fails, the client can use the updated broker list to attempt connections to other brokers in the cluster.</li>
+<li>Kafka clients usually implement automatic failover by retrying connections to other brokers or automatically updating their metadata when necessary.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> After connecting to any Broker (called a bootstrap broker), client receives a metadata with list of all brokers and then it will be able to connected to the entire cluster/broker (Kaka clients hae smart mechanism for that)</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="ChatGPT">ChatGPT</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-kafka-topic-replication-factors">6. Kafka Topic Replication Factors</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Apache Kafka is a distributed software system in the Big Data world. Thus, for such a system, there is a requirement to have copies of the stored data.
+<ul>
+<li>In Kafka, each broker contains some sort of data. But, what if the broker or the machine fails down? The data will be lost. <em>Precautionary</em>, Apache Kafka <strong>enables a feature of replication to secure data loss</strong> even when a broker fails down.</li>
+<li>To do so, a replication factor is created for the topics contained in any particular broker.
+<ul>
+<li>A replication factor is the number of copies of data over multiple brokers. The replication factor value should be greater than 1 always (PROD) (usually between 2 or 3, most commonly 3).
+<ul>
+<li>This helps to store a replica of the data in another broker from where the user can access it.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>It is obvious to have confusion when both the actual data and its replicas are present. The cluster may get confuse that which broker should serve the client request.</li>
+<li>To remove such confusion, the following task is done by Kafka:
+<ul>
+<li>It chooses one of the broker's partition as a leader, and the rest of them becomes its followers. At any time only one broker can be the partition leader.
+<ul>
+<li><strong>Producers</strong> can only send data to the broker that is leader of a partition.</li>
+</ul>
+</li>
+<li>The followers(brokers) will be allowed to synchronize the data. But, in the presence of a leader, none of the followers is allowed to serve the clien t's request. These replicas are known as ISR(in-sync-replica). So, Apache Kafka offers multiple <strong>ISR (in-sync-replica)</strong> for the data.</li>
+</ul>
+</li>
+<li>Therefore, only the leader is allowed to serve the client request. The leader handles all the read and writes operations of data for the partitions. The leader and its followers are determined by the zookeeper.</li>
+</ul>
+</li>
+<li><strong>Consumers: Replica fetching:</strong>
+<ul>
+<li>Since Kafka 2.4+, it's possible to configure consumers to read data from closest  replica.</li>
+<li>This may help to reduce the latency and also decrease network costs if using cloud (if broker replica is in same data center).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://www.javatpoint.com/kafka-topic-replication">https://www.javatpoint.com/kafka-topic-replication</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-kafka-zookeeper">6. Kafka: Zookeeper</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>A ZooKeeper is used to store information about the Kafka cluster and details of the consumer clients. It manages brokers by maintaining a list of them.
+<ul>
+<li>Also, a ZooKeeper is responsible for choosing a leader for the partitions.</li>
+<li>It doesn't store consumer offsets starting Kafka &gt; v0.10.</li>
+</ul>
+</li>
+<li>If any changes like a broker die, new topics, etc., occurs, the ZooKeeper sends notifications to Apache Kafka.</li>
+<li>For reliable ZooKeeper service, you should deploy ZooKeeper in a cluster(multi-server) known as an ensemble. As long as a majority of the ensemble are up, the service will be available.</li>
+<li>A ZooKeeper is designed to operate with an odd number of Kafka servers (1, 3, 5, 7 - Never more than 7 usually). Zookeeper has a leader server that handles all the writes, and rest of the servers are the followers who handle all the reads.
+<ul>
+<li>However, a user does not directly interact with the Zookeeper, but via brokers.</li>
+<li><strong>Kafka 2.x</strong> server can't run without a zookeeper server. It is <em><strong>mandatory to run the zookeeper server</strong></em>.</li>
+<li>Now from <strong>Kafka 3.x</strong> it can run without a <em><strong>Zookeeper(KIP-500)</strong></em> server, using <em><strong>Kafka Raft (KRaft)</strong></em> instead.
+<ul>
+<li>Kafka 3.3.1 (KIP-833) implements the Raft protocol (KRaft) in order to relace Zookeeper and is PROD ready.</li>
+</ul>
+</li>
+<li><strong>Kafka 4.x</strong> will be released only with KRaft (no Zookeeper).</li>
+<li>The reason of Zookeeper migration is it'sless secure than <em>Kafka</em>, and therefore Zookeeper ports should only be opened to allowed traffic from Kafka brokers and not from Kafka clients.</li>
+</ul>
+</li>
+<li><strong>KIP-500: (Replace ZooKeeper with a Self-Managed Metadata Quorum)</strong>
+<ul>
+<li>The controller nodes comprise a Raft quorum which manages the metadata log. This log contains information about each change to the cluster metadata. Everything that is currently stored in ZooKeeper, such as topics, partitions, ISRs, configurations, and so on, will be stored in this log.</li>
+<li>Using the Raft algorithm, the controller nodes will elect a leader from amongst themselves, without relying on any external system. The leader of the metadata log is called the <strong>active controller</strong>.
+<ul>
+<li>The active controller handles all RPCs made from the brokers. The follower controllers replicate the data which is written to the active controller, and serve as hot standbys if the active controller should fail. Because the controllers will now all track the latest state, controller failover will not require a lengthy reloading period where we transfer all the state to the new controller.</li>
+</ul>
+</li>
+<li>Just like ZooKeeper, Raft requires a majority of nodes to be running in order to continue running.
+<ul>
+<li>Therefore, a three-node controller cluster can survive one failure.</li>
+<li>A five-node controller cluster can survive two failures, and so on.</li>
+</ul>
+</li>
+<li>Periodically, the controllers will write out a snapshot of the metadata to disk. While this is conceptually similar to compaction, the code path will be a bit different because we can simply read the state from memory rather than re-reading the log from disk.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Note:</ins></strong>
+<ul>
+<li><strong>With Kafka Client?</strong>
+<ul>
+<li>Overtime, the Kafka clients and CLI have been migrated to <em>leverage the brokers as a connection endpoint</em> instead of Zookeeper.</li>
+<li>Since <strong>Kafka 0.10</strong>, consumers store offset Kafka &amp; Zookeeper, and <em>must not connect to Zookeeper as it's deprecated.</em></li>
+<li>Since, <strong>Kafka 2.2</strong>, the <em><a href="http://kafka-topics.sh">kafka-topics.sh</a></em> references <em>Kafka Brokers</em> and not Zookeeper for topic management (creation, deletion, ... etc) and Zoookeeper CLI argument is deprecated.
+<ul>
+<li>All the APIs and Commands that were previously leveraging Zookeeper are migrated to use Kafaka instead, so that when clusters are migrated to be without Zookeeper, the change is invisible to the clients.</li>
+<li></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum">https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum</a></li>
+<li><a href="https://zookeeper.apache.org/doc/r3.3.3/zookeeperAdmin.html#:~:text=Because%20Zookeeper%20requires%20a%20majority,do%20not%20constitute%20a%20majority.">https://zookeeper.apache.org/doc/r3.3.3/zookeeperAdmin.html#:~:text=Because%20Zookeeper%20requires%20a%20majority,do%20not%20constitute%20a%20majority.</a></li>
+<li><a href="https://www.udemy.com/course/apache-kafka/learn/lecture/11566886?start=0#content">Course Lecture</a></li>
+<li></li>
 </ul>
 </li>
 </ul>

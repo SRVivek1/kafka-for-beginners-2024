@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Kafka&colon; Setup and CLI &lpar;Command Line Interface&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="kafka-setup-and-cli-command-line-interface">Kafka: Setup and CLI (Command Line Interface)</h1>
+<h2 id="0-resources">0. Resources</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Port</th>
+<th>Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kafka</td>
+<td>9092</td>
+<td>Default port</td>
+</tr>
+<tr>
+<td>Zookeeper</td>
+<td>2181</td>
+<td>Default port</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="1-kafka-install-kafka-conductor-docker-setup-and-local-cli">1. Kafka: Install Kafka (Conductor) docker setup and local CLI</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Setup <code>Conduktor Kafka</code> in local docker.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Make sure Java SDK 11 or higher is installed and is updated in PATH.</li>
+<li><em><strong>Step-1:</strong></em> Install <code>Conducktor</code> in docker.
+<ul>
+<li>Download <em>docker-compose.yml</em>
+<ul>
+<li>[curl -L <a href="https://releases.conduktor.io/quick-start">https://releases.conduktor.io/quick-start</a> -o docker-compose.yml](curl -L <a href="https://releases.conduktor.io/quick-start">https://releases.conduktor.io/quick-start</a> -o docker-compose.yml)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Start the services
+<ul>
+<li><code>docker compose up -d --wait</code>
+<ul>
+<li><strong>-d:</strong> Detached mode: Run containers in the background.</li>
+<li><strong>--wait:</strong> Wait for services to be running|healthy. Implies detached mode.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Launch Service.
+<ul>
+<li>Go to <em><strong><a href="http://localhost:8080/">http://localhost:8080/</a></strong></em>
+<ul>
+<li>Requires <em>sign-up</em> for first  time login.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> <em>Kafka Local Binary/executables setup</em>
+<ul>
+<li>Download latest kafka binaries from <a href="https://kafka.apache.org/downloads">https://kafka.apache.org/downloads</a>.</li>
+<li><strong>Extract</strong> it to local and <strong>set the path</strong> <em>(preferebly in ~/.profile file)</em> to it's bin directory.</li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> Starting <em>Zookeeper server</em>
+<ul>
+<li><strong>Command:</strong> <em><a href="http://zookeeper-server-start.sh">zookeeper-server-start.sh</a> /path/to/kafka-2.13-3.9.0/config/zookeeper.properties</em>
+<ul>
+<li>Zookeeper requires <em>zookeeper.properties</em> file to start/boot.</li>
+<li>We can use the default <em>zookeeper.properties</em> available as part of <em>kafka-executables</em>.</li>
+<li>Change the <strong>Default Data directory</strong> <em>dataDir=/tmp/zookeeper</em> in <em>zookeeper.properties</em>, the directory where the snapshot is stored.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-6:</strong></em> Starting Kafka Server (broker)
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-server-start.sh">kafka-server-start.sh</a> /path/to/kafka-2.13-3.9.0/config/server.properties</em>
+<ul>
+<li>Change the <strong>Default logs directory</strong> <em>log.dirs=/tmp/kafka-logs</em> in <em>server.properties</em>
+<ul>
+<li>It accets a comma separated list of directories under which to store log files.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Default Configuration:</strong> <em>server.properties</em>
+<ul>
+<li><strong>num.partitions:</strong> If required we can update default default partitions from 1 to 'X' (standar is 3) by updating <em>num.partitions=3</em>.</li>
+<li><strong>Port:</strong>
+<ul>
+<li><strong>IPv4:</strong> <em>listeners=PLAINTEXT://localhost:9092</em></li>
+<li><strong>IPv6:</strong> <em>listeners=PLAINTEXT://[::1]:9092</em></li>
+</ul>
+</li>
+<li><strong>log.dirs:</strong> <em>log.dirs=/tmp/kafka-logs/broker-0</em></li>
+<li><strong>Disable auto topic creation:</strong>
+<ul>
+<li>Add following property in kafka <em>server.properties</em>
+<ul>
+<li><code>auto.create.topics.enable=false</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-7:</strong></em> Lanch 2nd Kafka broker.
+<ul>
+<li>Create new <em>server-broker-1.properties</em> and update below default configuration.
+<ul>
+<li><strong>ID:</strong> <em>broker.id=1</em></li>
+<li><strong>Port:</strong>
+<ul>
+<li><strong>IPv4:</strong> <em>listeners=PLAINTEXT://localhost:9093</em></li>
+<li><strong>IPv6:</strong> <em>listeners=PLAINTEXT://[::1]:9093</em></li>
+</ul>
+</li>
+<li><strong>log.dirs:</strong> <em>log.dirs=/tmp/kafka-logs/broker-1</em></li>
+</ul>
+</li>
+<li><strong>Command:</strong> Launch Kafka server
+<ul>
+<li><em><a href="http://kafka-server-start.sh">kafka-server-start.sh</a> ./server-broker-1.properties</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-8:</strong></em> Stopping servers.
+<ul>
+<li><strong>First</strong> stop Kafka server.</li>
+<li><strong>Second</strong> stop Zookeeper server.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Note: Trobleshoot connectivity issues on Windows WSL 2 <a href="https://docs.conduktor.io/desktop/kafka-cluster-connection/setting-up-a-connection-to-kafka/connecting-to-kafka-running-on-windows-wsl-2/">Connecting-to-kafka-running-on-windows-wsl-2/</a>.</p>
+</blockquote>
+<ul>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://cwiki.apache.org/confluence/display/KAFKA/KIP-361%3A+Add+Consumer+Configuration+to+Disable+Auto+Topic+Creation">https://cwiki.apache.org/confluence/display/KAFKA/KIP-361%3A+Add+Consumer+Configuration+to+Disable+Auto+Topic+Creation</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-kafka-install-kafka-with-kraft-without-zookeeper">2. Kafka: Install Kafka with KRAFT (without Zookeeper)</h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Start Kafaka server using KRAFT (without Zookeeper)</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Some change/step</li>
+<li><em><strong>Step-1:</strong></em> Generate a new <em>Cluster UUID</em>.
+<ul>
+<li><strong>Command:</strong> <code>kafka-storage.sh random-uuid</code></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Format the storage (Log Directories).
+<ul>
+<li><strong>Command:</strong> <code>kafka-storage.sh format -t Nl0GbGlqReSzOsMirclqoQ -c /path/to/kafka-2.13-3.9.0/config/kraft/server.properties</code></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Start Kafka Server using KRAFT configuration properties.
+<ul>
+<li><strong>Command:</strong> <code>kafka-server-start.sh /path/to/kafka-2.13-3.9.0/config/kraft/server.properties</code></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Stopping kafka server
+<ul>
+<li>Press <code>Ctrl + C</code> in terminal.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://learn.conduktor.io/kafka/how-to-install-apache-kafka-on-linux-without-zookeeper-kraft-mode/">https://learn.conduktor.io/kafka/how-to-install-apache-kafka-on-linux-without-zookeeper-kraft-mode/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-kafka-topics-cli-kafka-topicssh">3. Kafka Topics CLI: <em><a href="http://kafka-topics.sh">kafka-topics.sh</a></em></h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Connecting to Kafka in docker using Kafka CLI commands.</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em>
+<ul>
+<li>Ensure all <em>Zookeeper (Step-5)</em> and <em>Kafka (Step-6)</em> servers are up and running.</li>
+<li><strong>Refer,</strong> <em>Section-1</em> for setup process.</li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> List topics in kafka server.
+<ul>
+<li><strong>List all topics (just names):</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server localhost:19092 --list</em></li>
+<li><strong>List all topics (with config details):</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server localhost:19092 --describe</em></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Create a new topic
+<ul>
+<li><strong>Create topic:</strong>
+<ul>
+<li><strong>IPv4:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server localhost:9092 --topic first_topic --create</em></li>
+<li><strong>IPv6:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server [::1]:9092 --topic first_topic --create</em></li>
+</ul>
+</li>
+<li><strong>Note:</strong>
+<ul>
+<li><em>WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide.</em></li>
+<li><em>To avoid issues it is best to use either, but not both.</em></li>
+<li><strong>Troubleshooting:</strong>
+<ul>
+<li><em>Error:</em> <em>[2025-01-06 10:55:26,226] WARN [AdminClient clientId=adminclient-1] Connection to node -1 (localhost/127.0.0.1:9092) could not be established. Node may not be available. (org.apache.kafka.clients.NetworkClient)</em></li>
+<li><em><strong>Remediation:</strong></em> Add below lister configuration in <em>/path/to/kafka/config/server.properties</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Create topic with # partition config</li>
+<li><strong>Create topic with defined partitions:</strong>
+<ul>
+<li><strong>IPv4:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server localhost:9092 --topic second_topic --create --partitions 3</em></li>
+<li><strong>IPv6:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server [::1]:9092 --topic second_topic --create --partitions 3</em></li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Create topic with replication factor.
+<ul>
+<li><strong>Create topic with defined partitions and replicas</strong>
+<ul>
+<li><strong>IPv4:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3 --replication-factor 1</em></li>
+<li><strong>IPv6:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server [::1]:9092 --topic third_topic --create --partitions 3 --replication-factor 1</em></li>
+<li><strong>Note:</strong>
+<ul>
+<li><em>Replication factor should not be greater than available brokers</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> Delete a topic
+<ul>
+<li><strong>IPv4:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server localhost:9092 --topic first_topic --delete</em></li>
+<li><strong>IPv6:</strong> <em><a href="http://kafka-topics.sh">kafka-topics.sh</a> --bootstrap-server [::1]:9092 --topic first_topic --delete</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> Replace <code>localhost</code> with <code>[::1]</code> if using IPv6.</p>
+</blockquote>
+<ul>
+<li><strong><ins>All Commands:</ins></strong><pre><code class="language-sh">  <span class="hljs-comment">############################</span>
+  <span class="hljs-comment">#####     LOCALHOST    #####</span>
+  <span class="hljs-comment">############################</span>
+
+  <span class="hljs-comment"># ****Note: Replace `localhost` with `[::1]` if using IPv6</span>
+
+  <span class="hljs-comment"># List all topics in Kafka server</span>
+  kafka-topics.sh --bootstrap-server localhost:9092 --list 
+  kafka-topics.sh --bootstrap-server [::1]:9092 --list
+
+  <span class="hljs-comment"># Describe all topics in Kafka server with configuration details</span>
+  kafka-topics.sh --bootstrap-server localhost:19092 --describe
+  kafka-topics.sh --bootstrap-server [::1]:19092 --describe
+
+  <span class="hljs-comment"># Describe specific topic in Kafka server with configuration details</span>
+  kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --describe
+  kafka-topics.sh --bootstrap-server [::1]:9092 --topic first_topic --describe
+
+  <span class="hljs-comment"># Create topic named `first_topic`</span>
+  kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create
+  kafka-topics.sh --bootstrap-server [::1]:9092 --topic first_topic --create
+
+  <span class="hljs-comment"># Create a topic with name `second_topic` with 3 partitions</span>
+  kafka-topics.sh --bootstrap-server localhost:9092 --topic second_topic --create --partitions 3
+  kafka-topics.sh --bootstrap-server [::1]:9092 --topic second_topic --create --partitions 3
+
+  <span class="hljs-comment"># Create a topic with name `third_topic` with 3 partitions and 2 replicas</span>
+  <span class="hljs-comment"># Faile in local: Replication factor should not be greater than available brokers.</span>
+  kafka-topics.sh --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3 --replication-factor 2
+  kafka-topics.sh --bootstrap-server [::1]:9092 --topic third_topic --create --partitions 3 --replication-factor 2
+
+  <span class="hljs-comment"># Create a topic (working)</span>
+  kafka-topics.sh --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3 --replication-factor 1
+  kafka-topics.sh --bootstrap-server [::1]:9092 --topic third_topic --create --partitions 3 --replication-factor 1
+
+  <span class="hljs-comment"># Delete a topic </span>
+  kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --delete
+  kafka-topics.sh --bootstrap-server [::1]:9092 --topic first_topic --delete
+  <span class="hljs-comment"># (only works if delete.topic.enable=true)</span>
+
+  <span class="hljs-comment"># list all active brokers</span>
+  zookeeper-shell.sh localhost:2181 <span class="hljs-built_in">ls</span> /brokers/ids
+  zookeeper-shell.sh [::1]:2181 <span class="hljs-built_in">ls</span> /brokers/ids
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="4-kafka-console-producer---kafka-console-producersh">4. Kafka Console Producer - <em><a href="http://kafka-console-producer.sh">kafka-console-producer.sh</a></em></h2>
+<ul>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
+<ul>
+<li>Produce data using <em><a href="http://kafka-console-producer.sh">kafka-console-producer.sh</a></em> executable/script.</li>
+<li><strong>Typical kafka console producer</strong><center>
+  <img src="./images/kafka-console-producer.png" alt="kafka console producer flowchat" title="Typical kafka console producer flowchat" width="700" height="300"/>
+</center>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>Steps</ins></strong></p>
+<ul>
+<li><em><strong>Project Setup:</strong></em> <em>Zookeeper</em> and at least one <em>Kafka server</em> must be running.</li>
+<li><em><strong>Step-1:</strong></em> Push message to topic using CLI <em><a href="http://kafka-console-producer.sh">kafka-console-producer.sh</a></em>
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-producer.sh">kafka-console-producer.sh</a> --bootstrap-server [::1]:9092 --topic first_topic</em>
+<ul>
+<li>This command give a prompt to enter mesages, which will be pushed to the topic.</li>
+<li>Every new Prompt/Line is a seperate message.</li>
+</ul>
+<center>
+  <img src="./images/kafka-console-producer-cmd.png" alt="kafka console producer command" title="Typical kafka console producer command" width="620" height="90"/>
+</center>
+</li>
+<li><strong>Non existing Topic:</strong> Shows warnning, if topic doesn't exist Creates one with given name.
+<ul>
+<li><em>WARN [Producer clientId=console-producer] The metadata response from the cluster reported a recoverable issue with correlation id 5 : {new_topic=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Push message with <em>producer.properties</em> for acknowledgement.
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-producer.sh">kafka-console-producer.sh</a> --bootstrap-server [::1]:9092 --topic first_topic <strong>--producer-property acks=all</strong></em></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Push messages with keys
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-producer.sh">kafka-console-producer.sh</a> --bootstrap-server [::1]:9092 --topic first_topic <strong>--property parse.key=true --property key.separator=:</strong></em>
+<ul>
+<li><strong>Note:</strong> It throws error if message is sent without the defined <em>key seperator</em>.</li>
+</ul>
+</li>
+<li>Producing messages with keys.<center>
+  <img src="./images/kafka-console-producer-cmd-with-keys.png" alt="kafka console producer command with keys" title="Typical kafka console producer command with keys" width="620" height="80"/>
+</center>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-4</strong></em> Produce data to all partitions with RoundRobin mechanism.
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-producer.sh">kafka-console-producer.sh</a> --bootstrap-server [::1]:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic first_topic</em></li>
+<li><strong>Paritioner property:</strong>
+<ul>
+<li><em>org.apache.kafka.clients.producer.RoundRobinPartitioner</em> class explicity specifies partitioning strategy to distribute the messages if there's more than one parititon.</li>
+</ul>
+</li>
+<li><strong>Note:</strong>
+<ul>
+<li>Do not use in <em>PRODUCTION</em> environment, it's one of the most inefficient Partitioning stretegy.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Note:</strong></p>
+<ul>
+<li>Press <em><strong>Ctrl + C</strong></em> to exit the console.</li>
+<li>We must create topics with the appropriate number of partitions before producing to them.</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>All Commands:</ins></strong></p>
+<pre><code class="language-sh">    <span class="hljs-comment">############################</span>
+    <span class="hljs-comment">#####     LOCALHOST    #####</span>
+    <span class="hljs-comment">############################</span>
+
+    <span class="hljs-comment"># Crete topic if doesn&#x27;t exists</span>
+    kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create --partitions 1
+    kafka-topics.sh --bootstrap-server [::1]:9092 --topic first_topic --create --partitions 1
+
+    <span class="hljs-comment"># producing</span>
+    <span class="hljs-comment"># For IPv4 use - --bootstrap-server localhost:9092</span>
+    kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic first_topic 
+    &gt; Hello World
+    &gt;My name is Conduktor
+    &gt;I love Kafka
+    &gt;^C  (&lt;- Ctrl + C is used to <span class="hljs-built_in">exit</span> the producer)
+
+
+    <span class="hljs-comment"># producing with properties acknowledge all</span>
+    kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic first_topic --producer-property acks=all
+    &gt; some message that is acked
+    &gt; just <span class="hljs-keyword">for</span> fun
+    &gt; fun learning!
+
+
+    <span class="hljs-comment"># producing to a non existing topic throws warnning and the topic will be created internally.</span>
+    <span class="hljs-comment"># we must prevent topics from auto creation, check steps section for details.</span>
+    kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic new_topic
+    &gt; hello world!
+
+    <span class="hljs-comment"># our new topic only has 1 partition</span>
+    kafka-topics.sh --bootstrap-server [::1]:9092 --list
+    kafka-topics.sh --bootstrap-server [::1]:9092 --topic new_topic --describe
+
+
+    <span class="hljs-comment"># edit config/server.properties or config/kraft/server.properties</span>
+    <span class="hljs-comment"># num.partitions=3</span>
+    <span class="hljs-comment"># produce against a non existing topic again</span>
+    kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic new_topic_2
+    hello again!
+
+    <span class="hljs-comment"># this time our topic has 3 partitions</span>
+    kafka-topics.sh --bootstrap-server [::1]:9092 --list
+    kafka-topics.sh --bootstrap-server [::1]:9092 --topic new_topic_2 --describe
+
+    <span class="hljs-comment"># produce messages with keys</span>
+    kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic first_topic --property parse.key=<span class="hljs-literal">true</span> --property key.separator=:
+    &gt;key1:value1
+    &gt;name:srvivek
+</code></pre>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
+<ul>
+<li><a href="https://learn.conduktor.io/kafka/kafka-producer-cli-tutorial/">https://learn.conduktor.io/kafka/kafka-producer-cli-tutorial/</a></li>
+<li><a href="https://www.javatpoint.com/sending-data-to-kafka-topics">https://www.javatpoint.com/sending-data-to-kafka-topics</a></li>
+<li><a href="https://docs.confluent.io/kafka/operations-tools/kafka-tools.html">https://docs.confluent.io/kafka/operations-tools/kafka-tools.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-kafka-console-consumer-kafka-console-consumersh">5. Kafka Console Consumer <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a></em></h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Consume data using <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a></em> executable/script.</li>
+<li><strong>Typical kafka consumers</strong><center>
+  <img src="./images/kafka-console-consumer.png" alt="Typical kafka consumer" title="Typical kafka consumer" width="700" height="270"/>
+</center>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> <em>Zookeeper</em> and at least one <em>Kafka server</em> must be running.</li>
+<li><em><strong>Step-1:</strong></em> Create topic if doesn't exist and produce message to the topic.
+<ul>
+<li><em>Check section-4 for kafka producer and commands.</em></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Kafka consumer to consume message.
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a> --bootstrap-server [::1]:9092 --topic first_topic</em></li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Consume message from beginning
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a> --bootstrap-server [::1]:9092 --topic first_topic --from-beginning</em></li>
+<li><strong>Note:</strong>
+<ul>
+<li>The message ordering will not be same as produced as messages will be read from all partitions independently.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Consume message and print message metadata (from beginning)
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a> --bootstrap-server [::1]:9092 --topic first_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --from-beginning</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>All Commands</ins></strong><pre><code class="language-sh">    <span class="hljs-comment">############################</span>
+    <span class="hljs-comment">#####     LOCALHOST    #####</span>
+    <span class="hljs-comment">############################</span>
+
+    <span class="hljs-comment"># create a topic with 3 partitions</span>
+    kafka-topics.sh --bootstrap-server [::1]:9092 --topic first_topic --create --partitions 3
+
+    <span class="hljs-comment"># consuming new messages</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic
+
+    <span class="hljs-comment"># producing other terminal</span>
+    <span class="hljs-comment"># RoundRobin to all partitions</span>
+    kafka-console-producer.sh --bootstrap-server [::1]:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic first_topic
+
+    <span class="hljs-comment"># consuming messages from beginning</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --from-beginning
+
+    <span class="hljs-comment"># consume messages and display key, values and timestamp in consumer</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=<span class="hljs-literal">true</span> --property print.key=<span class="hljs-literal">true</span> --property print.value=<span class="hljs-literal">true</span> --property print.partition=<span class="hljs-literal">true</span> --from-beginning
+</code></pre>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://learn.conduktor.io/kafka/kafka-consumer-cli-tutorial/">https://learn.conduktor.io/kafka/kafka-consumer-cli-tutorial/</a></li>
+<li><a href="https://www.javatpoint.com/kafka-console-consumer">https://www.javatpoint.com/kafka-console-consumer</a></li>
+<li><a href="https://docs.confluent.io/kafka/operations-tools/kafka-tools.html">https://docs.confluent.io/kafka/operations-tools/kafka-tools.html</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-kafka-console-consumer-in-gropus-kafka-console-consumersh">6. Kafka Console Consumer in Gropus <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a></em></h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>Consume data using <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a></em> executable/script in consumer groups.</li>
+<li><strong>Note:</strong>
+<ul>
+<li>If consumers are less then partitions, then consumers can read from more than one parition.</li>
+<li>If consumers are more than parititions, then other consumers will be idle and will not consume data.</li>
+</ul>
+</li>
+<li><strong>Typical kafka consumers</strong><center>
+  <img src="./images/kafka-console-consumer-groups.png" alt="Typical kafka consumer groups" title="Typical kafka consumer groups" width="650" height="270"/>
+</center>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> <em>Zookeeper</em> and at least one <em>Kafka server</em> must be running.</li>
+<li><em><strong>Step-1:</strong></em> Create new topic if doesn't exist or have 1 partition and produce message to the topic.
+<ul>
+<li><em>Check section-4 for kafka producer and commands.</em></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Kafka consumer to consume message in group
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a> --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application</em></li>
+<li><strong>Note:</strong>
+<ul>
+<li>If we will not provide the <em>--group xxxx</em> then a temproary consumer group is cretaed to consume the message and auto-removed later.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-3:</strong></em> Cretea another kafka consumer in same group
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a> --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application</em></li>
+<li><strong>Note:</strong>
+<ul>
+<li>If no consumers were up and we start the first consumer, it will read all unread/new the messages.</li>
+<li>We can have any number of consumers.
+<ul>
+<li>But one partition can read by only one consumer while a single consumer can read from multiple partitions, in case if consumers count is less then paritions count.</li>
+<li>If there are more consumers then other will be idle and will not consume any messsage.</li>
+</ul>
+</li>
+<li>The message ordering will not be same as produced as messages will be read from all partitions independently.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em><strong>Step-4:</strong></em> Consume message in group and print message metadata
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a> --bootstrap-server [::1]:9092 --topic third_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --group my-first-application</em></li>
+</ul>
+</li>
+<li><em><strong>Step-5:</strong></em> To read message from beginning, we need to create a new group <em>my-second-application</em> for the topic.
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a> --bootstrap-server [::1]:9092 --topic third_topic --formatter org.apache.kafka.tools.consumer.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --group my-second-application --from-beginning</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>All Commands</ins></strong><pre><code class="language-sh">    <span class="hljs-comment"># create a topic with 3 partitions</span>
+    <span class="hljs-comment"># If doesn&#x27;t exists or have 1 partition</span>
+    kafka-topics.sh --bootstrap-server [::1]:9092 --topic third_topic --create --partitions 3
+
+    <span class="hljs-comment"># start one consumer</span>
+    <span class="hljs-comment"># It will not read old messages</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application
+
+    <span class="hljs-comment"># start one producer and start producing</span>
+    kafka-console-producer.sh --bootstrap-server [::1]:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic third_topic
+
+    <span class="hljs-comment"># start another consumer part of the same group. See messages being spread</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application
+
+    <span class="hljs-comment"># start another consumer part of a different group from beginning</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-second-application --from-beginning
+</code></pre>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://learn.conduktor.io/kafka/kafka-consumers-in-group-cli-tutorial/">https://learn.conduktor.io/kafka/kafka-consumers-in-group-cli-tutorial/</a></li>
+<li><a href="https://www.javatpoint.com/kafka-consumer-group-cli">https://www.javatpoint.com/kafka-consumer-group-cli</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="7-kafka-consumer-group-management-kafka-consumer-groupssh">7. Kafka consumer group management <em><a href="http://kafka-consumer-groups.sh">kafka-consumer-groups.sh</a></em></h2>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>The Kafka Consumer Groups CLI kafka-consumer-groups is used to manage consumer groups in Kafka.</li>
+<li>This tool helps to list all consumer groups, describe a consumer group, delete consumer group info, or reset consumer group offsets.</li>
+<li>Generally, a Kafka consumer belongs to a particular consumer group. A consumer group basically represents the name of an application. In order to consume messages in a consumer group, '-group' command is used.</li>
+<li><strong>A typical kafka consumer groups</strong><center>
+  <img src="./images/kafka-consumer-groups-cli.png" alt="Kafka consumer groups CLI" title="Typical kafka consumer groups" width="600" height="270"/>
+</center>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> <em>Zookeeper</em> and at least one <em>Kafka server</em> must be running.</li>
+<li><em><strong>Step-1:</strong></em> List all consumers groups
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-consumer-groups.sh">kafka-consumer-groups.sh</a> --bootstrap-server [::1]:9092 --list</em></li>
+</ul>
+</li>
+<li><em><strong>Step-2:</strong></em> Get details (describe) a group
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-consumer-groups.sh">kafka-consumer-groups.sh</a> --bootstrap-server [::1]:9092 --describe --group my-first-application</em></li>
+<li><strong>Response:</strong> <em>Note: Only one consumer is running.</em>
+<ul>
+<li><strong>LAG:</strong> Unread messages in topic.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-properties">    <span class="hljs-attr">GROUP</span>                <span class="hljs-string">TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG    CONSUMER-ID                                           HOST             CLIENT-ID</span>
+    <span class="hljs-attr">my-first-application</span> <span class="hljs-string">third_topic     2          13              15              2      console-consumer-5b341142-1f1a-4838-84e0-790690e71804 /0:0:0:0:0:0:0:1 console-consumer</span>
+    <span class="hljs-attr">my-first-application</span> <span class="hljs-string">third_topic     1          13              14              1      console-consumer-5b341142-1f1a-4838-84e0-790690e71804 /0:0:0:0:0:0:0:1 console-consumer</span>
+    <span class="hljs-attr">my-first-application</span> <span class="hljs-string">third_topic     0          13              15              2      console-consumer-5b341142-1f1a-4838-84e0-790690e71804 /0:0:0:0:0:0:0:1 console-consumer</span>
+</code></pre>
+</li>
+<li><em><strong>Step-3:</strong></em> Describe members of the group.
+<ul>
+<li><strong>Command:</strong> <em><a href="http://kafka-consumer-groups.sh">kafka-consumer-groups.sh</a> --bootstrap-server [::1]:9092 --describe --group my-first-application --members</em></li>
+<li><strong>Response:</strong></li>
+</ul>
+<pre><code class="language-properties">    <span class="hljs-attr">GROUP</span>                 <span class="hljs-string">CONSUMER-ID                                            HOST             CLIENT-ID        #PARTITIONS</span>
+    <span class="hljs-attr">my-first-application</span>  <span class="hljs-string">console-consumer-5b341142-1f1a-4838-84e0-790690e71804  /0:0:0:0:0:0:0:1 console-consumer 3</span>
+</code></pre>
+</li>
+<li><em><strong>Step-4</strong></em> Reset offset of a topic to the beginning. Ensure that <em>Consumers</em> are not running.
+<ul>
+<li><strong>Command (Dry Run):</strong> <em><a href="http://kafka-consumer-groups.sh">kafka-consumer-groups.sh</a> --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --dry-run</em>
+<ul>
+<li><strong>Response:</strong></li>
+</ul>
+<pre><code class="language-properties">    <span class="hljs-attr">GROUP</span>                  <span class="hljs-string">TOPIC           PARTITION   NEW-OFFSET     </span>
+    <span class="hljs-attr">my-first-application</span>   <span class="hljs-string">third_topic     2           0              </span>
+    <span class="hljs-attr">my-first-application</span>   <span class="hljs-string">third_topic     1           0              </span>
+    <span class="hljs-attr">my-first-application</span>   <span class="hljs-string">third_topic     0           0            </span>
+</code></pre>
+</li>
+<li><strong>Command (Execute):</strong> <em><a href="http://kafka-consumer-groups.sh">kafka-consumer-groups.sh</a> --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --execute</em>
+<ul>
+<li><strong>Response:</strong> <em>No consumers are connected,to demonstrate the LAG</em></li>
+</ul>
+<pre><code class="language-properties">    <span class="hljs-attr">GROUP</span>                 <span class="hljs-string">TOPIC         PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG   CONSUMER-ID   HOST  CLIENT-ID</span>
+    <span class="hljs-attr">my-first-application</span>  <span class="hljs-string">third_topic   2          0               16              16    -             -     -</span>
+    <span class="hljs-attr">my-first-application</span>  <span class="hljs-string">third_topic   1          0               15              15    -             -     -</span>
+    <span class="hljs-attr">my-first-application</span>  <span class="hljs-string">third_topic   0          0               15              15    -             -     -</span>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Notes:</ins></strong>
+<ul>
+<li>Kafka provides lot more options to reset the offset, check documentation for more details.</li>
+<li>Here are some of flags for offset reset.
+<ul>
+<li><strong>--to-current:</strong> <em>Reset offsets to current offset.</em></li>
+<li><strong>--to-datetime &lt;String: datetime&gt;:</strong> <em>Reset offsets to offset from datetime. Format: 'YYYY-MM-DDTHH:mm:SS.sss'</em></li>
+<li><strong>--to-earliest:</strong> <em>Reset offsets to earliest offset.</em></li>
+<li><strong>--to-latest:</strong> <em>Reset offsets to latest offset.</em></li>
+<li><strong>--to-offset &lt;Long: offset&gt;:</strong> <em>Reset offsets to a specific offset.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>All Commands:</ins></strong><pre><code class="language-sh">    <span class="hljs-comment"># documentation for the command </span>
+    kafka-consumer-groups.sh 
+
+    <span class="hljs-comment"># list consumer groups</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --list
+    
+    <span class="hljs-comment"># describe one specific group</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-second-application
+
+    <span class="hljs-comment"># describe another group</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+
+    <span class="hljs-comment"># desriber members of the group</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application --members
+
+    <span class="hljs-comment"># start a consumer</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --group my-first-application
+
+    <span class="hljs-comment"># describe the group now</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+
+    <span class="hljs-comment"># describe a console consumer group (change the end number)</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group console-consumer-10592
+
+    <span class="hljs-comment"># start a console consumer</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic first_topic --group my-first-application
+
+    <span class="hljs-comment"># describe the group again</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+
+
+    <span class="hljs-comment">#############################</span>
+    <span class="hljs-comment">######  Reset offset   ######</span>
+    <span class="hljs-comment">#############################</span>
+
+    <span class="hljs-comment"># Dry Run: reset the offsets to the beginning of each partition</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --dry-run
+
+    <span class="hljs-comment"># execute flag is needed</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --execute
+
+    <span class="hljs-comment"># describe the consumer group again</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+
+    <span class="hljs-comment"># consume from where the offsets have been reset</span>
+    kafka-console-consumer.sh --bootstrap-server [::1]:9092 --topic third_topic --group my-first-application
+
+    <span class="hljs-comment"># describe the group again</span>
+    kafka-consumer-groups.sh --bootstrap-server [::1]:9092 --describe --group my-first-application
+</code></pre>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://www.javatpoint.com/kafka-consumer-group-cli">https://www.javatpoint.com/kafka-consumer-group-cli</a></li>
+<li><a href="https://learn.conduktor.io/kafka/kafka-consumer-group-management-cli-tutorial/">https://learn.conduktor.io/kafka/kafka-consumer-group-management-cli-tutorial/</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+
+            
+            
+        </body>
+        </html>
