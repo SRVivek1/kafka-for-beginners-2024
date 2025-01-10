@@ -14,6 +14,8 @@ public class KafkaProducerPoc {
 
     public static void main(String[] args) {
 
+        logger.info("KafkaProducerPoc - main() execution started.");
+
         // Create properties wit kafka configuration
         final Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "[::1]:9092");
@@ -27,11 +29,16 @@ public class KafkaProducerPoc {
         // Create Kafka producer
         final KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
+        logger.debug("Writing record to topic : {}", record1);
         producer.send(record1);
+
+        logger.debug("Writing record to topic : {}", record2);
         producer.send(record2);
 
         //flush and close
         producer.flush();
         producer.close();
+
+        logger.info("KafkaProducerPoc - main() execution completed.");
     }
 }
