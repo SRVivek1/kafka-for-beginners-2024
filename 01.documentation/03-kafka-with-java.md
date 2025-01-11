@@ -248,7 +248,184 @@
     ```
 - **<ins>References:</ins>**
   - [https://www.javatpoint.com/kafka-producer-callbacks](https://www.javatpoint.com/kafka-producer-callbacks)
+  - [https://www.confluent.io/blog/apache-kafka-producer-improvements-sticky-partitioner/](https://www.confluent.io/blog/apache-kafka-producer-improvements-sticky-partitioner/)
 ---
+
+## 4. Kafka Producers: Inprovement using sticky partitioner
+### Project ref: [a3-kafka-partitioner-demo](https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a3-kafka-partitioner-demo)  
+- **<ins>Purpose / Feature</ins>**
+    - The amount of time it takes for a message to move through a system plays a big role in the performance of distributed systems like Apache Kafka.
+      - In Kafka, the latency of the producer is often defined as the time it takes for a message produced by the client to be acknowledged by Kafka.
+    - Each Kafka topic contains one or more partitions. When a Kafka producer sends a record to a topic, it needs to decide which partition to send it to. If we send several records to the same partition at around the same time, they can be sent as a batch.
+      - Processing each batch requires a bit of overhead, with each of the records inside the batch contributing to that cost. Records in smaller batches have a higher effective cost per record. Generally, smaller batches lead to more requests and queuing, resulting in higher latency.
+    - A batch is completed either when it reaches a certain size (batch.size) or after a period of time (linger.ms) is up. Both batch.size and linger.ms are configured in the producer. 
+      - The default for ***batch.size*** is *16,384 bytes*, and the default of ***linger.ms*** is *0* milliseconds. 
+      - Once batch.size is reached or at least linger.ms time has passed, the system will send the batch as soon as it is able.
+    - Even when linger.ms is 0, the producer will group records into batches when they are produced to the same partition around the same time. This is because the system needs a bit of time to handle each request, and batches form when the system cannot attend to them all right away.
+  - **Partitioning strategy** 
+    - If records are not sent to the same partition, they cannot form a batch together. 
+    - Kafka producers can configuring a Partitioner class to select partitioning strategy. 
+      - The Partitioner assigns the partition for each record.
+      - The default behavior is to hash the key of a record to get the partition, but some records may have a key that is null. 
+        - In this case, the old partitioning strategy before Apache Kafka 2.4 would be to cycle through the topic’s partitions and send a record to each one.
+        -  Unfortunately, this method does not batch very well and may in fact add latency. Due to the potential for increased latency with small batches, the original strategy for partitioning records with null keys can be inefficient. 
+        -  This changes with Apache Kafka 2.4, which introduces ***sticky partitioning***, a new strategy for assigning records to partitions with proven lower latency.
+   - **Sticky partitioning strategy:**
+   - The sticky partitioner addresses the problem of spreading out records without keys into smaller batches by picking a single partition to send all non-keyed records. 
+     - Once the batch at that partition is filled or otherwise completed, the sticky partitioner randomly chooses and “sticks” to a new partition. 
+     - That way, over a larger period of time, records are about evenly distributed among all the partitions while getting the added benefit of larger batch sizes.
+   - In order to change the sticky partition, Apache Kafka 2.4 also adds a new method called *onNewBatch* to the *Partitioner interface* for use right before a new batch is created, which is the perfect time to change the sticky partition. *DefaultPartitioner* implements this feature.
+     <center>
+      <img src="./images/kafka-sticking-partitioning-strategy.png" alt="Kafka Sticking Partitioning Strategy" title="Typical kafka streams ecosystem" width="600" height="300"/>
+    </center>
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Refer *Section-2 & 3* for project setup.
+  - ***Step-1:*** Update ProducerConfig properties.
+    - **Partitioner Class:** 
+      - *properties.setProperty(ProducerConfig.PARTITIONER_CLASS_CONFIG, RoundRobinPartitioner.class.getName());*
+    - **Batch Size:**
+      - *properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, "500");*
+- **<ins>Gradle / External dependency</ins>**
+  - Required dependency.
+      ```groovy
+            dependencies {
+              implementation("org.apache.kafka:kafka-clients:3.9.0")
+              implementation("org.slf4j:slf4j-api:2.0.16")
+              implementation("org.slf4j:slf4j-simple:2.0.16")
+            }
+      ```
+- **<ins>Code / Config changes</ins>**
+  - **Kafka Producer:** *KafkaProducerPartitionerPoc.java*
+    - imports
+      - *import org.apache.kafka.clients.producer.RoundRobinPartitioner;*
+    - Configure Batch size and Partitioner class.
+      ```java
+          public class KafkaProducerPartitionerPoc {
+
+            private static final Logger logger = LoggerFactory.getLogger(KafkaProducerPartitionerPoc.class);
+
+            public static void main(String[] args) {
+
+                logger.info("execution started for main(...)");
+
+                Properties properties = new Properties();
+                properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
+                properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+                properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+                // RoundRobin partitioner (Not rec. for PROD.)- send messages to each queue
+                // Note: keep partitioner default as per kafka config
+                properties.setProperty(ProducerConfig.PARTITIONER_CLASS_CONFIG, RoundRobinPartitioner.class.getName());
+
+                //set batch size
+                // Note: keep it default as per kafka config
+                properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, "500");
+
+                final KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+
+                // send data in multiple batches
+                for (int i = 0; i < 10; i++) {
+                    for (int j = 0; j < 30; j++) {
+                        producer.send(new ProducerRecord<>("demo_java", String.format("Message: Hello World testing partitioner in kafka. Test [i: %s, j: %s]", i, j)), new Callback() {
+                            @Override
+                            public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                                if (e == null) {
+                                    logger.info("Record Metadata. \nTopic: {} \nPartition: {} \nOffset: {} \nTimestamp: {} \n",
+                                            recordMetadata.topic(), recordMetadata.partition(),
+                                            recordMetadata.offset(), recordMetadata.timestamp());
+                                } else {
+                                    logger.error("Error: {}", e.getStackTrace());
+                                }
+                            }
+                        });
+                        producer.flush();
+                    }
+                    // sleep thread for 500ms
+                    try {
+                        logger.info("Thread will sleep for 500ms.");
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                producer.close();
+                logger.info("execution completed for main(...)");
+            }
+        }
+      ```
+    - **Output:** *IDE Console*
+      ```properties
+          # FYI - it will send data to each parition in batches as batch theshhold is reached.
+      ```
+- **<ins>References:</ins>**
+  - [https://www.redpanda.com/guides/kafka-tutorial-kafka-partition-strategy](https://www.redpanda.com/guides/kafka-tutorial-kafka-partition-strategy)
+  - [https://www.confluent.io/blog/apache-kafka-producer-improvements-sticky-partitioner/](https://www.confluent.io/blog/apache-kafka-producer-improvements-sticky-partitioner/)
+---
+
+## 5. Kafka Producer: Choose partition in topic using *key* in record
+### Project ref: [a1-kafka-producer](https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a1-kafka-producer)
+- **<ins>About / Introduction</ins>**
+  - Along side the message value, we can choose to send a message key and that key could be a string, a number etc type.
+    - This is an important property of Kafka which helps us to preserve the ordering for messages with specific field by passing same key for these kind of messages by sending all the messages that share the same key to the same partition.
+    - When we don’t send the key, the key is set to *null* and the data will be sent to randomly selected patition as *Partitioning class / strategy*. 
+- **<ins>Steps</ins>**
+  - ***Project Setup:*** Create Kafka Producer application.
+    - Refer above *section-2 to 4* for project setup. 
+  - ***Step-1:*** Update *ProducerRecord* to include *key* along with *message* & *topic name*.
+    - *ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, key, message)*
+- **App:** *KafkaProducerRecordWithKeys.java*
+      ```java
+          public class KafkaProducerRecordWithKeys {
+            private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecordWithKeys.class);
+
+            public static void main(String[] args) {
+                logger.info("Execution started for main(...)");
+
+                final Properties properties = new Properties();
+                properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
+                properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+                properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+                final KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+
+                final String TOPIC = "demo_java";
+                // Send data
+                for (int j = 0; j < 10; j++) {
+                    for (int i = 0; i < 10; i++) {
+
+                        String key = "id_" + i;
+                        String message = "hello world - " + i;
+
+                        producer.send(new ProducerRecord<>(TOPIC, key, message), new Callback() {
+                            @Override
+                            public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+
+                                if (e == null) {
+                                    logger.info("Record: Key: {}, Partition: {}", key, recordMetadata.partition());
+                                } else {
+                                    logger.error("Stacktrace:\n{}", e.getStackTrace());
+                                }
+                            }
+                        });
+                        producer.flush();
+                    }
+                    // sleep thead to create bataches
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                producer.close();
+                logger.info("Execution completed for main(...)");
+            }
+        }
+      ```
+- **<ins>References:</ins>**
+  - [https://www.geeksforgeeks.org/apache-kafka-message-keys/](https://www.geeksforgeeks.org/apache-kafka-message-keys/)
+
+---
+
 
 
 
