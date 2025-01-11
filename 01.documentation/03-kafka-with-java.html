@@ -2,7 +2,7 @@
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>1&period; Kafka Client libraries SDKs</title>
+            <title>Kafka programming with Java</title>
             <style>
 /* From extension vscode.github */
 /*---------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@
         
         </head>
         <body class="vscode-body vscode-light">
-            <p>#Kafka programming with Java</p>
+            <h1 id="kafka-programming-with-java">Kafka programming with Java</h1>
 <h2 id="1-kafka-client-libraries-sdks">1. Kafka Client libraries SDKs</h2>
 <ul>
 <li><strong><ins>About / Introduction</ins></strong>
@@ -152,9 +152,7 @@
     implementation &#x27;org.apache.kafka<span class="hljs-punctuation">:</span>kafka-clients<span class="hljs-punctuation">:</span><span class="hljs-number">3.9</span><span class="hljs-number">.0</span>&#x27;
 </code></pre>
 </li>
-<li><strong>Maven:</strong></li>
-</ul>
-<pre><code class="language-xml">    <span class="hljs-comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients --&gt;</span>
+<li><strong>Maven:</strong><pre><code class="language-xml">    <span class="hljs-comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients --&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.kafka<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>kafka-clients<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
@@ -162,17 +160,15 @@
     <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 </code></pre>
 </li>
+</ul>
+</li>
 <li><strong>The official Kafka Streams client library:</strong> <em>To create your Kafka Streams application</em>
 <ul>
-<li><strong>Gradle:</strong></li>
-</ul>
-<pre><code class="language-json">      <span class="hljs-comment">// https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams</span>
+<li><strong>Gradle:</strong><pre><code class="language-json">      <span class="hljs-comment">// https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams</span>
       implementation &#x27;org.apache.kafka<span class="hljs-punctuation">:</span>kafka-streams<span class="hljs-punctuation">:</span><span class="hljs-number">3.9</span><span class="hljs-number">.0</span>&#x27;
 </code></pre>
-<ul>
-<li><strong>Maven:</strong></li>
-</ul>
-<pre><code class="language-xml">    <span class="hljs-comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams --&gt;</span>
+</li>
+<li><strong>Maven:</strong><pre><code class="language-xml">    <span class="hljs-comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams --&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.kafka<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>kafka-streams<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
@@ -180,39 +176,37 @@
     <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 </code></pre>
 </li>
+</ul>
+</li>
 <li><strong>Kafka for Spring Boot:</strong> Applies Spring concepts to Kafka development
 <ul>
 <li><strong>Reference:</strong> <a href="https://spring.io/projects/spring-kafka#overview">https://spring.io/projects/spring-kafka#overview</a></li>
+<li><strong>Gradle:</strong><pre><code class="language-gradle">    <span class="hljs-comment">// https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka</span>
+    implementation <span class="hljs-string">&#x27;org.springframework.kafka:spring-kafka:3.3.1&#x27;</span>
+</code></pre>
+</li>
+<li><strong>Maven:</strong><pre><code class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.kafka<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-kafka<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</code></pre>
+</li>
 </ul>
-</li>
-<li><strong>Gradle:</strong><pre><code class="language-json">    <span class="hljs-comment">// https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka</span>
-    implementation &#x27;org.springframework.kafka<span class="hljs-punctuation">:</span>spring-kafka<span class="hljs-punctuation">:</span><span class="hljs-number">3.3</span><span class="hljs-number">.1</span>&#x27;
-</code></pre>
-</li>
-<li><strong>Maven:</strong><pre><code class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.kafka<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-kafka<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
-</code></pre>
 </li>
 <li><strong>Spring Cloud Stream:</strong> Bindings for Kafka Stream
 <ul>
 <li><strong>Reference:</strong> <a href="https://spring.io/projects/spring-cloud-stream">https://spring.io/projects/spring-cloud-stream</a></li>
-<li><strong>Gradle:</strong></li>
-</ul>
-<pre><code class="language-json">    <span class="hljs-comment">// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-stream</span>
-    implementation &#x27;org.springframework.cloud<span class="hljs-punctuation">:</span>spring-cloud-stream<span class="hljs-punctuation">:</span><span class="hljs-number">4.2</span><span class="hljs-number">.0</span>&#x27;
+<li><strong>Gradle:</strong><pre><code class="language-gradle">    <span class="hljs-comment">// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-stream</span>
+    implementation <span class="hljs-string">&#x27;org.springframework.cloud:spring-cloud-stream:4.2.0&#x27;</span>
     
     <span class="hljs-comment">// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-stream-binder-kafka</span>
-    implementation &#x27;org.springframework.cloud<span class="hljs-punctuation">:</span>spring-cloud-stream-binder-kafka<span class="hljs-punctuation">:</span><span class="hljs-number">4.2</span><span class="hljs-number">.0</span>&#x27;
+    implementation <span class="hljs-string">&#x27;org.springframework.cloud:spring-cloud-stream-binder-kafka:4.2.0&#x27;</span>
 
     <span class="hljs-comment">// https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka</span>
-    implementation &#x27;org.springframework.kafka<span class="hljs-punctuation">:</span>spring-kafka<span class="hljs-punctuation">:</span><span class="hljs-number">3.3</span><span class="hljs-number">.1</span>&#x27;
+    implementation <span class="hljs-string">&#x27;org.springframework.kafka:spring-kafka:3.3.1&#x27;</span>
 </code></pre>
-<ul>
-<li><strong>Maven:</strong></li>
-</ul>
-<pre><code class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+</li>
+<li><strong>Maven:</strong><pre><code class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-stream<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
@@ -226,13 +220,14 @@
   <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
 </code></pre>
 </li>
+</ul>
+</li>
 <li><strong>Akka Streams &amp; Alpakka Kafka</strong>
 <ul>
 <li><strong>Documentation:</strong>
 <ul>
 <li><a href="https://doc.akka.io/libraries/akka-core/current/stream/index.html">https://doc.akka.io/libraries/akka-core/current/stream/index.html</a></li>
 <li><a href="https://doc.akka.io/libraries/alpakka-kafka/current/home.html">https://doc.akka.io/libraries/alpakka-kafka/current/home.html</a></li>
-<li></li>
 </ul>
 </li>
 </ul>
@@ -247,7 +242,7 @@
 </ul>
 <hr>
 <h2 id="2-kafka-client---hello-world">2. Kafka Client - Hello world</h2>
-<h3 id="project-ref-xx-xxxx-xx-xxxx">Project ref: <em>xx-xxxx-xx-xxxx</em></h3>
+<h3 id="project-ref-a1-kafka-producer">Project ref: <a href="https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a1-kafka-producer">a1-kafka-producer</a></h3>
 <ul>
 <li><strong><ins>Purpose / Feature</ins></strong>
 <ul>
@@ -279,7 +274,7 @@
 </ul>
 </li>
 <li><em><strong>Step-3:</strong></em> Create properties for target Kafka server.</li>
-<li><em><strong>Step-4:</strong></em> Cretae Kafka ProducerRecord with message to be sent to topic.</li>
+<li><em><strong>Step-4:</strong></em> Cretae Kafka ProducerRecord with <em>Topic name</em> &amp; <em>message</em> to be sent to topic.</li>
 <li><em><strong>Step-5:</strong></em> Create Kafka Producer object using the <em>kafka properties</em>.</li>
 <li><em><strong>Step-6:</strong></em> Pass the kafka record to <em>Kafka Producer</em> <em><strong>send(record)</strong></em> to send to topic.</li>
 <li><em><strong>Step-7:</strong></em> Flush the data using <em>producer</em> instance.</li>
@@ -288,59 +283,59 @@
 </li>
 <li><strong><ins>Gradle / External dependency</ins></strong>
 <ul>
-<li>Required dependency.<pre><code class="language-json">      dependencies <span class="hljs-punctuation">{</span>
+<li>Required dependency.<pre><code class="language-groovy">      dependencies {
         implementation(<span class="hljs-string">&quot;org.apache.kafka:kafka-clients:3.9.0&quot;</span>)
         implementation(<span class="hljs-string">&quot;org.slf4j:slf4j-api:2.0.16&quot;</span>)
         implementation(<span class="hljs-string">&quot;org.slf4j:slf4j-simple:2.0.16&quot;</span>)
         testImplementation(platform(<span class="hljs-string">&quot;org.junit:junit-bom:5.9.1&quot;</span>))
         testImplementation(<span class="hljs-string">&quot;org.junit.jupiter:junit-jupiter&quot;</span>)
-      <span class="hljs-punctuation">}</span>
+      }
 </code></pre>
 </li>
 </ul>
 </li>
 <li><strong><ins>Code / Config changes</ins></strong>
 <ul>
-<li><strong>Producer:</strong> <em>KafkaProducerDemo.java</em>
+<li><strong>Producer:</strong> <em>KafkaProducerPoc.java</em>
 <ul>
 <li>imports
 <ul>
 <li><em>import org.apache.kafka.clients.producer.KafkaProducer;</em></li>
 <li><em>import org.apache.kafka.clients.producer.ProducerRecord;</em></li>
 <li><em>import org.apache.kafka.common.serialization.StringSerializer;</em></li>
+<li><em>import java.util.Properties;</em></li>
 </ul>
 </li>
-<li>Producer class to publish data to topics.<pre><code class="language-java">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KafkaProducerDemo</span> {
+<li>Producer class to publish data to topics.<pre><code class="language-java">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KafkaProducerPoc</span> {
 
-      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(KafkaProducerDemo.class);
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(KafkaProducerPoc.class);
 
       <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
-          logger.info(<span class="hljs-string">&quot;Hello World.&quot;</span>);
 
-          <span class="hljs-comment">// Create Producer properties</span>
+          <span class="hljs-comment">// Create properties wit kafka configuration</span>
           <span class="hljs-keyword">final</span> <span class="hljs-type">Properties</span> <span class="hljs-variable">properties</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();
           properties.setProperty(<span class="hljs-string">&quot;bootstrap.servers&quot;</span>, <span class="hljs-string">&quot;[::1]:9092&quot;</span>);
           properties.setProperty(<span class="hljs-string">&quot;key.serializer&quot;</span>, StringSerializer.class.getName());
           properties.setProperty(<span class="hljs-string">&quot;value.serializer&quot;</span>, StringSerializer.class.getName());
 
-          <span class="hljs-comment">// Create Producer</span>
-          KafkaProducer&lt;String, String&gt; producer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KafkaProducer</span>&lt;&gt;(properties);
+          <span class="hljs-comment">// Create kafka record to encapsulate the data</span>
+          ProducerRecord&lt;String, String&gt; record1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProducerRecord</span>&lt;&gt;(<span class="hljs-string">&quot;demo_java&quot;</span>, <span class="hljs-string">&quot;Hello&quot;</span>);
+          ProducerRecord&lt;String, String&gt; record2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProducerRecord</span>&lt;&gt;(<span class="hljs-string">&quot;demo_java&quot;</span>, <span class="hljs-string">&quot;World&quot;</span>);
 
-          <span class="hljs-comment">// Create producer record</span>
-          ProducerRecord&lt;String, String&gt; record = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProducerRecord</span>&lt;&gt;(<span class="hljs-string">&quot;demo_java&quot;</span>, <span class="hljs-string">&quot;hello-world 1&quot;</span>);
-          ProducerRecord&lt;String, String&gt; record2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProducerRecord</span>&lt;&gt;(<span class="hljs-string">&quot;demo_java&quot;</span>, <span class="hljs-string">&quot;hello-world 2&quot;</span>);
+          <span class="hljs-comment">// Create Kafka producer</span>
+          <span class="hljs-keyword">final</span> KafkaProducer&lt;String, String&gt; producer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KafkaProducer</span>&lt;&gt;(properties);
 
-          <span class="hljs-comment">// Send data</span>
-          producer.send(record);
+          producer.send(record1);
           producer.send(record2);
 
-          <span class="hljs-comment">// flush and close the producer</span>
+          <span class="hljs-comment">//flush and close</span>
           producer.flush();
           producer.close();
-
-          logger.info(<span class="hljs-string">&quot;completed API execution.&quot;</span>);
       }
   }
+</code></pre>
+</li>
+<li><strong>Output: <em>Terminal</em></strong> <em><a href="http://kafka-console-consumer.sh">kafka-console-consumer.sh</a></em><pre><code class="language-properties">    <span class="hljs-attr">TBU</span>
 </code></pre>
 </li>
 </ul>
@@ -349,7 +344,140 @@
 </li>
 <li><strong><ins>References:</ins></strong>
 <ul>
-<li>None</li>
+<li><a href="https://www.javatpoint.com/creating-kafka-producer-in-java">https://www.javatpoint.com/creating-kafka-producer-in-java</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-kafka-producers-callbacks">3. Kafka Producers: callbacks</h2>
+<h3 id="project-ref-a2-kafka-producer-with-callbacks">Project ref: <a href="https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a2-kafka-producer-with-callbacks">a2-kafka-producer-with-callbacks</a></h3>
+<ul>
+<li><strong><ins>Purpose / Feature</ins></strong>
+<ul>
+<li>The callback is a function passed when sending data to topic. This function is implemented for asynchronously handling the request completion, hence <em>void</em> return type.</li>
+<li>The callback function used by the producer is the <em>onCompletion()</em> with two arguments:
+<ul>
+<li><strong>Metadata of the Record:</strong>
+<ul>
+<li>Metadata of the record means fetching the information regarding the partition and its offsets.</li>
+<li>If it is not null, an error will be thrown.</li>
+</ul>
+</li>
+<li><strong>Exception:</strong>
+<ul>
+<li>Following are two exceptions which can be thrown while processing:
+<ul>
+<li><strong>Retriable exception:</strong>
+<ul>
+<li>This exception says that the message may be sent.</li>
+</ul>
+</li>
+<li><strong>Non-retriable exception:</strong>
+<ul>
+<li>This exception throws the error that the message will never be sent.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Steps</ins></strong>
+<ul>
+<li><em><strong>Project Setup:</strong></em> Develop kafka producer app.
+<ul>
+<li>Check <em>Section-2</em> for reference.</li>
+</ul>
+</li>
+<li><em><strong>Step-1:</strong></em> Create and pass Kafka <em>Callback.java</em> class instance in send(...) method.
+<ul>
+<li>Add completion business logic inside <em>onCompletion(...)</em> method.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><ins>Gradle / External dependency</ins></strong>
+<ul>
+<li>Required dependency.<pre><code class="language-groovy">      dependencies {
+        implementation(<span class="hljs-string">&quot;org.apache.kafka:kafka-clients:3.9.0&quot;</span>)
+        implementation(<span class="hljs-string">&quot;org.slf4j:slf4j-api:2.0.16&quot;</span>)
+        implementation(<span class="hljs-string">&quot;org.slf4j:slf4j-simple:2.0.16&quot;</span>)
+      }
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>Code / Config changes</ins></strong>
+<ul>
+<li><strong>Producer:</strong> <em>KafkaProducerPoc.java</em>
+<ul>
+<li>imports
+<ul>
+<li><em>import org.apache.kafka.clients.producer.Callback;</em></li>
+<li><em>import org.apache.kafka.clients.producer.ProducerConfig;</em></li>
+</ul>
+</li>
+<li>Producer class to publish data to topics with <em>Callback instance</em>.<pre><code class="language-java">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KafkaProducerWithCallbacks</span> {
+
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(KafkaProducerWithCallbacks.class);
+
+      <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+          logger.info(<span class="hljs-string">&quot;KafkaProducerWithCallbacks execution started.&quot;</span>);
+
+          <span class="hljs-keyword">final</span> <span class="hljs-type">Properties</span> <span class="hljs-variable">properties</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();
+          <span class="hljs-comment">/*properties.setProperty(&quot;bootstrap.servers&quot;, &quot;[::1]:9092&quot;);
+          properties.setProperty(&quot;key.serializer&quot;, StringSerializer.class.getName());
+          properties.setProperty(&quot;value.serializer&quot;, StringSerializer.class.getName());*/</span>
+
+          properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="hljs-string">&quot;[::1]:9092&quot;</span>);
+          properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+          properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+          <span class="hljs-comment">//Kafka producer</span>
+          KafkaProducer&lt;String, String&gt; producer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KafkaProducer</span>&lt;&gt;(properties);
+
+          <span class="hljs-comment">// send data and register callback for status</span>
+          producer.send(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ProducerRecord</span>&lt;&gt;(<span class="hljs-string">&quot;demo_java&quot;</span>, <span class="hljs-string">&quot;callback demo app&quot;</span>), <span class="hljs-keyword">new</span> <span class="hljs-title class_">Callback</span>() {
+              <span class="hljs-comment">// Executes every time a message is successfully sent or exception occurs.</span>
+              <span class="hljs-meta">@Override</span>
+              <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCompletion</span><span class="hljs-params">(RecordMetadata recordMetadata, Exception e)</span> {
+
+                  <span class="hljs-comment">// check if no exception occurred</span>
+                  <span class="hljs-keyword">if</span> (e == <span class="hljs-literal">null</span>) {
+                      logger.info(<span class="hljs-string">&quot;Received new metadata. \nTopic: {}, \nPartition: {}, \nOffset: {}, \nTimestamp: {}&quot;</span>,
+                              recordMetadata.topic(), recordMetadata.partition(),
+                              recordMetadata.offset(), recordMetadata.timestamp());
+                  } <span class="hljs-keyword">else</span> {
+                      logger.error(<span class="hljs-string">&quot;Error while producing: {}&quot;</span>, e);
+                  }
+              }
+          });
+          <span class="hljs-comment">// flush and close</span>
+          producer.flush();
+          producer.close();
+
+          logger.info(<span class="hljs-string">&quot;KafkaProducerWithCallbacks execution completed.&quot;</span>);
+      }
+  }
+</code></pre>
+</li>
+<li>**Output: ** <em>IDE Console</em></li>
+</ul>
+<pre><code class="language-properties">    <span class="hljs-attr">[kafka-producer-network-thread</span> <span class="hljs-string">| producer-1] INFO com.srvivek.kafka.KafkaProducerWithCallbacks - Received new metadata. </span>
+    <span class="hljs-attr">Topic</span>: <span class="hljs-string">demo_java, </span>
+    <span class="hljs-attr">Partition</span>: <span class="hljs-string">2, </span>
+    <span class="hljs-attr">Offset</span>: <span class="hljs-string">51, </span>
+    <span class="hljs-attr">Timestamp</span>: <span class="hljs-string">1736577123225</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><strong><ins>References:</ins></strong>
+<ul>
+<li><a href="https://www.javatpoint.com/kafka-producer-callbacks">https://www.javatpoint.com/kafka-producer-callbacks</a></li>
 </ul>
 </li>
 </ul>
