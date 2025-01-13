@@ -10,13 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-public class KafkaConsumerApp {
+public class KafkaConsumerGracefulShutdownApp {
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerApp.class);
+    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerGracefulShutdownApp.class);
 
     private static final String GROUP_ID = "my-java-app-consumers";
 
@@ -56,24 +55,50 @@ public class KafkaConsumerApp {
         // Create consumer
         KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(getKafkaConfig());
 
+        //Add shutdown hook to gracefully close the consumer
+        final Thread mainThread = Thread.currentThread();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                logger.info("Detected shutdown. calling to initiate shutdown.");
+                kafkaConsumer.wakeup();
 
-        //subscribe
-        kafkaConsumer.subscribe(List.of(TOPIC));
-
-        // Poll for events
-        while (true) {
-
-            logger.info("Polling.................");
-            // The maximum time to block.
-            // Must not be greater than Long.MAX_VALUE milliseconds.
-            final ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
-
-            for (ConsumerRecord<String, String> record : records) {
-                logger.info("Key: {}, Value: {}", record.key(), record.value());
-                logger.info("Partition: {}, Offset: {}", record.partition(), record.offset());
+                try {
+                    mainThread.join();
+                } catch (InterruptedException e) {
+                    logger.error("Shutdown error while waiting for consumer to close resources. Message: {}", e.getMessage());
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
             }
+        });
+
+        try {
+            //subscribe
+            kafkaConsumer.subscribe(List.of(TOPIC));
+
+            // Poll for events
+            while (true) {
+
+                logger.info("Polling.................");
+                // The maximum time to block.
+                // Must not be greater than Long.MAX_VALUE milliseconds.
+                final ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
+
+                for (ConsumerRecord<String, String> record : records) {
+                    logger.info("Key: {}, Value: {}", record.key(), record.value());
+                    logger.info("Partition: {}, Offset: {}", record.partition(), record.offset());
+                }
+            }
+        } catch (WakeupException we) {
+            logger.info("Started shutdown for consumer.");
+        } catch (Exception e) {
+            logger.error("Unexpected error in consumer. Message: {}", e.getMessage());
+            e.printStackTrace();
+        } finally {
+            kafkaConsumer.close();
+            logger.info("Consumer is now gracefully shutdown.");
         }
-        // kafkaConsumer.close();
-        // logger.info("Execution completed of main(...)");
+        logger.info("Execution completed of main(...)");
     }
 }
