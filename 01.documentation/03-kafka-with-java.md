@@ -425,6 +425,155 @@
   - [https://www.geeksforgeeks.org/apache-kafka-message-keys/](https://www.geeksforgeeks.org/apache-kafka-message-keys/)
 
 ---
+## 6. Kafka Consumer: Read data from topic
+### Project ref: [a4-kafka-consumer](https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a4-kafka-consumer)
+- **<ins>Purpose / Feature</ins>**
+  - An Apache Kafka® Consumer is a client application that subscribes to (reads and processes) events from Kafka Topics.
+  - The Kafka consumer works by issuing “fetch” requests to the brokers (kafka server) leading the partitions it wants to consume. 
+    - The consumer offset is specified in the log with each request. 
+    - The consumer receives back a chunk of log that contains all of the messages in that topic beginning from the offset position. 
+    - The consumer has significant control over this position and can rewind it to re-consume data if desired.
+  - To use the *subscribe* or *commit* methods provided by the KafkaConsumer API, we must assign the consumer to a *consumer group* by setting the ***group.id*** property. 
+    - If consumer is not part of any group, then an exception is thrown when these methods are called.
+  - **Offset management:**
+    - After the consumer receives its assignment from the coordinator, it must determine the initial position for each assigned partition. 
+    - When the group is first created, before any messages have been consumed, the position is set according to a configurable offset reset policy (auto.offset.reset). 
+      - Typically, consumption starts either at the *earliest offset* or the *latest offset*.
+    - **Property: *auto.offset.reset:***
+      - Following are 3 possible values:
+        - **none:** *Fail if the consumer group doesn't exists.*
+        - **earliest:** *Read events from beginning*
+        - **latest:** *Read new messages/events*
+- **<ins>Steps</ins>**
+   - ***Project Setup:*** 
+    - Create a gradle project using intellij IDEA IDE or by visiting *https://start.spring.io/*.
+    - Delete `src` folder from project home directory.
+  - ***Step-1:*** Create a *new module* inside project.
+    - **Steps:** Right Click on the project --> New --> Module
+      - Select appropriate option on the given form and click *Create*.
+  - ***Step-2:*** Add following dependencies.
+     - **Kafka Clients:** *implementation("org.apache.kafka:kafka-clients:3.9.0")*
+     - **Slf4j API:** *implementation("org.slf4j:slf4j-api:2.0.16")*
+     - **Slf4j Simple:** *implementation("org.slf4j:slf4j-simple:2.0.16")*
+   - ***Step-3:*** Create properties for target Kafka server.
+   - ***Step-4:*** Add properties for Consumer Configs e.g. key and value deserializer, group id etc.
+   - ***Step-5:*** Add Consumer config property *auto.offset.reset*
+   - ***Step-6:*** Create *KafkaConsumer* instance.
+   - ***Step-7:*** Create shutdown hook to current *Runtime* and join the Main Thread.
+     - *kafkaConsumer.wakeup():* Once this API is called, *Consumer* will throws exception on next *poll(..)* API invocation.
+       - **kafkaConsumer.wakeup():**
+         - Wakeup the consumer. This method is thread-safe and is useful in particular to abort a long poll. 
+         - The thread which is blocking in an operation will throw *org.apache.kafka.common.errors.WakeupException*.
+         - If no thread is blocking in a method which can throw *org.apache.kafka.common.errors.WakeupException*, the next call to such a method will raise it instead.
+   - ***Step-8*** Handle *WakeupException* with *poll(..)* call and process graceful shutdown.
+   - ***Step-9:*** Subscribe to kafka topic using *KafkaConsumer.subscribe(..) API*.
+   - ***Step-10:*** Poll for the data using *KafkaConsumer.poll(..) API*.
+   - ***Step-11:*** Iterate over the *ConsumerRecord* list and process it.
+   - ***Step-12:*** Graceful shudown of java app
+     - **1.** Attach *shutdownHook* to *Runtime* and pass a new thread to call *kafkaConsumer.wakeup()*, which will raise *WakeupException* if *poll(..)* is called.
+     - **2.** Catch the exception and close open resources of kafka.
+- **<ins>Code </ins>**
+  - **Consumer:** *KafkaConsumerApp.java*
+    - imports
+      - *import org.apache.kafka.clients.consumer.ConsumerConfig;*
+      - *import org.apache.kafka.clients.consumer.ConsumerRecord;*
+      - *import org.apache.kafka.clients.consumer.ConsumerRecords;*
+      - *import org.apache.kafka.clients.consumer.KafkaConsumer;*
+      - *import org.apache.kafka.common.errors.WakeupException;*
+    - Kafka Consumer class to poll messages from kafka.
+    	```java
+          public class KafkaConsumerApp {
+
+            private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerApp.class);
+            private static final String GROUP_ID = "my-java-app-consumers";
+            private static final String TOPIC = "demo_java";
+
+            /**
+            * Kafka consumer configuration
+            */
+            private static Properties getKafkaConfig() {
+
+                final Properties properties = new Properties();
+                properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
+                properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+                properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+
+                // set application group id
+                properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
+
+                // Read config
+                //Read only new messages
+                // properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+                // --> fail if consumer group doesn't exist
+                // properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "none");
+                // --> Read from beginning
+                properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+                // Don't create topics if not found.
+                properties.setProperty(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.toString(false));
+
+                return properties;
+            }
+
+            public static void main(String[] args) {
+
+                logger.info("Execution started of main(...)");
+
+                // Create consumer
+                KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(getKafkaConfig());
+
+                //Add shutdown hook to gracefully close the consumer
+                final Thread mainThread = Thread.currentThread();
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    @Override
+                    public void run() {
+                        logger.info("Detected shutdown. calling to initiate shutdown.");
+                        kafkaConsumer.wakeup();
+
+                        try {
+                            mainThread.join();
+                        } catch (InterruptedException e) {
+                            logger.error("Shutdown error while waiting for consumer to close resources. Message: {}", e.getMessage());
+                            e.printStackTrace();
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+
+                try {
+                    //subscribe
+                    kafkaConsumer.subscribe(List.of(TOPIC));
+
+                    // Poll for events
+                    while (true) {
+
+                        logger.info("Polling.................");
+                        // The maximum time to block.
+                        // Must not be greater than Long.MAX_VALUE milliseconds.
+                        final ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
+
+                        for (ConsumerRecord<String, String> record : records) {
+                            logger.info("Key: {}, Value: {}", record.key(), record.value());
+                            logger.info("Partition: {}, Offset: {}", record.partition(), record.offset());
+                        }
+                    }
+                } catch (WakeupException we) {
+                    logger.info("Started shutdown for consumer.");
+                } catch (Exception e) {
+                    logger.error("Unexpected error in consumer. Message: {}", e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    kafkaConsumer.close();
+                    logger.info("Consumer is now gracefully shutdown.");
+                }
+                logger.info("Execution completed of main(...)");
+            }
+        }
+      ```
+- **<ins>References:</ins>**
+  - [https://docs.confluent.io/platform/current/clients/consumer.html](https://docs.confluent.io/platform/current/clients/consumer.html)
+---
+
 
 
 
