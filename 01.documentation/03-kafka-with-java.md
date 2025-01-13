@@ -574,6 +574,88 @@
   - [https://docs.confluent.io/platform/current/clients/consumer.html](https://docs.confluent.io/platform/current/clients/consumer.html)
 ---
 
+## 7. Consumer group and rebalancing
+- **<ins>About / Introduction</ins>**
+  - The concept of rebalancing is fundamental to Kafka's consumer group architecture. When a consumer group is created, the group coordinator assigns partitions to each consumer in the group. Each consumer is responsible for consuming data from its assigned partitions. 
+  - However, as consumers join or leave the group or new partitions are added to a topic, the partition assignments become unbalanced. This is where rebalancing comes into play.
+    - Kafka rebalancing is the process by which Kafka redistributes partitions across consumers to ensure that each consumer is processing an approximately equal number of partitions. 
+    - This ensures that data processing is distributed evenly across consumers and that each consumer is processing data as efficiently as possible. 
+    - As a result, Kafka can scale efficiently and effectively, preventing any single consumer from becoming overloaded or underused.
+  - **Rebalacing:**
+    - ***Eager Rebalance***
+      - All consumers are stopped and giveup their membership of partitions.
+      - They rejoin the consumer group and get a new partition assignment.
+        - During this rejoining process entire consumer gropu stops processing, commonly called a “*stop the world effect*”. This causes delays and interruptions in data processing.
+        - There's no gurantee that consumers will get the same pastitions assignmend again.
+      - **How to use ?**
+        - Set Kafka Consumer configuration *partition.assignment.strategy*.
+          - *RangeAssignor:* 
+            - Assigns partition on per-topic basis (can lead to imbalance).
+          - *RoundRobin:*
+            - Assigns partitions across all topics in round-robin fashion (optimal balance).
+          - *StickyAssignor:*
+            - Balanced like *RoundRobin* and minimizes parition movements when consumer joins or leaves the group.
+    - ***Cooperative (Incremental) Rebalance:***
+      - Incremental cooperative rebalance protocol was introduced in Kafka 2.4 to minimize the disruption caused by Kafka rebalancing.
+      - In this strategy rebalancing is split into smaller sub-tasks, and consumers continue consuming data while these sub-tasks are completed. As a result, rebalancing occurs more quickly and with less interruption to data processing.
+      - It can go through several itertions to find a stable assignment (hence incremental).
+      - The protocol also provides more fine-grained control over the rebalancing process. 
+        - ***For example,*** it allows consumers to negotiate the specific set of partitions they will consume based on their current load and capacity. This prevents the overloading of individual consumers and ensures that partitions are assigned in a more balanced way.
+      - **How to use ?**
+        - Set Kafka Consumer configuration *partition.assignment.strategy*.
+          - *CooperativeStickyAssignor*
+            - Identical to *StickyAssignor* but supports *cooperative rebalance* and therefore consumers can keep consuming from the Topic.
+  - **How rebalancing works**
+    - Kafka provides several partition assignment strategies to determine how partitions are assigned during a rebalance and is called an “assignor”. 
+    - The default partition assignment strategy is round-robin, where Kafka assigns partitions to consumers one after another. 
+    - However, Kafka also provides “range” and “cooperative sticky” assignment strategies, which may be more appropriate for specific use cases.
+  - **When a rebalance occurs:**
+    - Kafka notifies each consumer in the group by sending a GroupCoordinator message.
+    - Each consumer then responds with a JoinGroup message, indicating its willingness to participate in the rebalance.
+    - Kafka then uses the selected partition assignment strategy to assign partitions to each consumer in the group.
+    - **Note:** 
+      - During a rebalance, Kafka may need to pause data consumption temporarily. 
+      - This is necessary to ensure all consumers have an up-to-date view of the partition assignments before re-consuming data.
+  - **What triggers Kafka rebalancing ?**
+    - *Consumer joins or leaves*
+    - *Temporary consumer failure*
+    - *Consumer idle for too long*
+    - *Topic partitions added*
+  - **Side effects of Kafka rebalancing**
+    - *Increased latency*
+    - *Reduced throughput*
+    - *Increased resource usage*
+    - *Increased complexity*
+    - *Potential data duplication and loss*
+  - **Measures to reduce rebalancing:**
+    - *Increase session timeout*
+      - The session timeout is the maximum time for a Kafka consumer to send a heartbeat to the broker.
+      - Increasing the session timeout increases the time a broker waits before marking a consumer as inactive. 
+        - Set the *session.timeout.ms* parameter to a higher value in the Kafka client configuration to increate session timeout. 
+        - However, setting this parameter too high leads to longer periods of consumer inactivity.
+    - *Reduce partitions per topic*
+      - Having too many partitions per topic increases the frequency of rebalancing. 
+      - When creating a topic, set the partition number by setting the *num.partitions* parameter to a lower value. 
+        - However, reducing the number of partitions also reduces the parallelism and throughput of your Kafka cluster.
+    - *Increase poll interval time*
+      - Sometimes messages take longer to process due to multiple network or I/O calls involved in processing failures and retries. In such cases, the consumer may be removed from the group frequently. 
+      - Set the consumer configuration *max.poll.interval.ms* with the maximum time the consumer can be idle before it is considered inactive and removed from the group. 
+      - Increasing the max.poll.interval.ms value in the consumer config helps avoid frequent consumer group changes.
+  - **Static group membership rebalancing?  *-- Not Recommended*** 
+    - It's a method of assigning Kafka partitions to consumers in a consumer group in a fixed and deterministic way without relying on automatic partition assignment. 
+      - In this approach, the developer defines the partition assignment explicitly instead of letting the Kafka broker manage it dynamically.
+    - With static group membership, consumers in a consumer group explicitly request the Kafka broker to assign them specific partitions by specifying the partition IDs in their configuration. 
+    - Each consumer only consumes messages from a specific subset of partitions, and the partition assignment remains fixed until explicitly changed by the consumer.
+      - *However, it's important to note that static group membership leads to ***uneven workload distribution*** among consumers and may only be suitable for some use cases*.
+      - **Note:** This is helpful when sonsumers maintain local state and cache (to avoid re-building the cache).
+    - **How to use ?:**
+      - Set the configuration *group.instance.id* to make a consumer a static member. 
+      - The same partition will be assigned to consumer if it rejoins before the session timeout *session.timeout.ms*.
+- **<ins>References:</ins>**
+  - [https://www.redpanda.com/guides/kafka-performance-kafka-rebalancing](https://www.redpanda.com/guides/kafka-performance-kafka-rebalancing)
+
+---
+
 
 
 
