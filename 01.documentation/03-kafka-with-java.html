@@ -646,8 +646,7 @@
 <h2 id="5-kafka-producer-choose-partition-in-topic-using-key-in-record">5. Kafka Producer: Choose partition in topic using <em>key</em> in record</h2>
 <h3 id="project-ref-a1-kafka-producer-1">Project ref: <a href="https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a1-kafka-producer">a1-kafka-producer</a></h3>
 <ul>
-<li>
-<p><strong><ins>About / Introduction</ins></strong></p>
+<li><strong><ins>About / Introduction</ins></strong>
 <ul>
 <li>Along side the message value, we can choose to send a message key and that key could be a string, a number etc type.
 <ul>
@@ -657,8 +656,7 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong><ins>Steps</ins></strong></p>
+<li><strong><ins>Steps</ins></strong>
 <ul>
 <li><em><strong>Project Setup:</strong></em> Create Kafka Producer application.
 <ul>
@@ -672,58 +670,47 @@
 </li>
 </ul>
 </li>
-<li>
-<p><strong>App:</strong> <em>KafkaProducerRecordWithKeys.java</em>
-```java
-public class KafkaProducerRecordWithKeys {
-private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecordWithKeys.class);</p>
-<pre><code>      public static void main(String[] args) {
-          logger.info(&quot;Execution started for main(...)&quot;);
-
-          final Properties properties = new Properties();
-          properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;[::1]:9092&quot;);
-          properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-          properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
-          final KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(properties);
-
-          final String TOPIC = &quot;demo_java&quot;;
-          // Send data
-          for (int j = 0; j &lt; 10; j++) {
-              for (int i = 0; i &lt; 10; i++) {
-
-                  String key = &quot;id_&quot; + i;
-                  String message = &quot;hello world - &quot; + i;
-
-                  producer.send(new ProducerRecord&lt;&gt;(TOPIC, key, message), new Callback() {
-                      @Override
-                      public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-
-                          if (e == null) {
-                              logger.info(&quot;Record: Key: {}, Partition: {}&quot;, key, recordMetadata.partition());
-                          } else {
-                              logger.error(&quot;Stacktrace:\n{}&quot;, e.getStackTrace());
-                          }
-                      }
-                  });
-                  producer.flush();
-              }
-              // sleep thead to create bataches
-              try {
-                  Thread.sleep(1000);
-              } catch (InterruptedException e) {
-                  throw new RuntimeException(e);
-              }
-          }
-          producer.close();
-          logger.info(&quot;Execution completed for main(...)&quot;);
-      }
-  }
-```
+<li><strong>App:</strong> <em>KafkaProducerRecordWithKeys.java</em><pre><code class="language-java">   <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KafkaProducerRecordWithKeys</span> {
+     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(KafkaProducerRecordWithKeys.class);
+     <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+         logger.info(<span class="hljs-string">&quot;Execution started for main(...)&quot;</span>);
+         <span class="hljs-keyword">final</span> <span class="hljs-type">Properties</span> <span class="hljs-variable">properties</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();
+         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="hljs-string">&quot;[::1]:9092&quot;</span>);
+         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+         <span class="hljs-keyword">final</span> KafkaProducer&lt;String, String&gt; producer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KafkaProducer</span>&lt;&gt;(properties);
+         <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">TOPIC</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;demo_java&quot;</span>;
+         <span class="hljs-comment">// Send data</span>
+         <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">j</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; j &lt; <span class="hljs-number">10</span>; j++) {
+             <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) {
+                 <span class="hljs-type">String</span> <span class="hljs-variable">key</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;id_&quot;</span> + i;
+                 <span class="hljs-type">String</span> <span class="hljs-variable">message</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;hello world - &quot;</span> + i;
+                 producer.send(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ProducerRecord</span>&lt;&gt;(TOPIC, key, message), <span class="hljs-keyword">new</span> <span class="hljs-title class_">Callback</span>() {
+                     <span class="hljs-meta">@Override</span>
+                     <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onCompletion</span><span class="hljs-params">(RecordMetadata recordMetadata, Exception e)</span> {
+                         <span class="hljs-keyword">if</span> (e == <span class="hljs-literal">null</span>) {
+                             logger.info(<span class="hljs-string">&quot;Record: Key: {}, Partition: {}&quot;</span>, key, recordMetadata.partition());
+                         } <span class="hljs-keyword">else</span> {
+                             logger.error(<span class="hljs-string">&quot;Stacktrace:\n{}&quot;</span>, e.getStackTrace());
+                         }
+                     }
+                 });
+                 producer.flush();
+             }
+             <span class="hljs-comment">// sleep thead to create bataches</span>
+             <span class="hljs-keyword">try</span> {
+                 Thread.sleep(<span class="hljs-number">1000</span>);
+             } <span class="hljs-keyword">catch</span> (InterruptedException e) {
+                 <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);
+             }
+         }
+         producer.close();
+         logger.info(<span class="hljs-string">&quot;Execution completed for main(...)&quot;</span>);
+     }
+ }
 </code></pre>
 </li>
-<li>
-<p><strong><ins>References:</ins></strong></p>
+<li><strong><ins>References:</ins></strong>
 <ul>
 <li><a href="https://www.geeksforgeeks.org/apache-kafka-message-keys/">https://www.geeksforgeeks.org/apache-kafka-message-keys/</a></li>
 </ul>
@@ -827,14 +814,12 @@ private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecord
 <ul>
 <li><strong>Consumer:</strong> <em>KafkaConsumerApp.java</em>
 <ul>
-<li>imports
-<ul>
-<li><em>import org.apache.kafka.clients.consumer.ConsumerConfig;</em></li>
-<li><em>import org.apache.kafka.clients.consumer.ConsumerRecord;</em></li>
-<li><em>import org.apache.kafka.clients.consumer.ConsumerRecords;</em></li>
-<li><em>import org.apache.kafka.clients.consumer.KafkaConsumer;</em></li>
-<li><em>import org.apache.kafka.common.errors.WakeupException;</em></li>
-</ul>
+<li>imports<pre><code class="language-java">    <span class="hljs-keyword">import</span> org.apache.kafka.clients.consumer.ConsumerConfig;
+    <span class="hljs-keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecord;
+    <span class="hljs-keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecords;
+    <span class="hljs-keyword">import</span> org.apache.kafka.clients.consumer.KafkaConsumer;
+    <span class="hljs-keyword">import</span> org.apache.kafka.common.errors.WakeupException;
+</code></pre>
 </li>
 <li>Kafka Consumer class to poll messages from kafka.<pre><code class="language-java">  <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KafkaConsumerApp</span> {
 
@@ -936,9 +921,11 @@ private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecord
 </li>
 </ul>
 <hr>
-<h2 id="7-consumer-group-and-rebalancing">7. Consumer group and rebalancing</h2>
+<h2 id="7-kafka-consumer-group-and-partition-rebalancing">7. Kafka Consumer group and partition rebalancing</h2>
+<h3 id="project-ref-a4-kafka-consumer-1">Project ref: <a href="https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a4-kafka-consumer">a4-kafka-consumer</a></h3>
 <ul>
-<li><strong><ins>About / Introduction</ins></strong>
+<li>
+<p><strong><ins>About / Introduction</ins></strong></p>
 <ul>
 <li>The concept of rebalancing is fundamental to Kafka's consumer group architecture. When a consumer group is created, the group coordinator assigns partitions to each consumer in the group. Each consumer is responsible for consuming data from its assigned partitions.</li>
 <li>However, as consumers join or leave the group or new partitions are added to a topic, the partition assignments become unbalanced. This is where rebalancing comes into play.
@@ -946,6 +933,11 @@ private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecord
 <li>Kafka rebalancing is the process by which Kafka redistributes partitions across consumers to ensure that each consumer is processing an approximately equal number of partitions.</li>
 <li>This ensures that data processing is distributed evenly across consumers and that each consumer is processing data as efficiently as possible.</li>
 <li>As a result, Kafka can scale efficiently and effectively, preventing any single consumer from becoming overloaded or underused.</li>
+<li>Kafka default strategy uses [&quot;o.a.k.c.consumer.RangeAssignor, &quot;o.a.k.c.consumer.CooperativeStickyAssignor&quot;].
+<ul>
+<li><em>RangeAssignor</em> has priority over other.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><strong>Rebalacing:</strong>
@@ -984,7 +976,7 @@ private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecord
 </li>
 </ul>
 </li>
-<li><em><strong>Cooperative (Incremental) Rebalance:</strong></em>
+<li><em><strong>Cooperative (Incremental) Rebalance:</strong></em> - <em>Recommended</em>
 <ul>
 <li>Incremental cooperative rebalance protocol was introduced in Kafka 2.4 to minimize the disruption caused by Kafka rebalancing.</li>
 <li>In this strategy rebalancing is split into smaller sub-tasks, and consumers continue consuming data while these sub-tasks are completed. As a result, rebalancing occurs more quickly and with less interruption to data processing.</li>
@@ -1104,13 +1096,244 @@ private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecord
 </li>
 </ul>
 </li>
-<li><strong><ins>References:</ins></strong>
+<li>
+<p><strong>Code changes</strong></p>
+<ul>
+<li><em><strong>Imports:</strong></em>
+<ul>
+<li><em>import org.apache.kafka.clients.consumer.CooperativeStickyAssignor;</em></li>
+</ul>
+</li>
+<li>***Consumer app: *** **<pre><code class="language-java">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KafkaConsumerIncrementalRebalancingApp</span> {
+
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(KafkaConsumerIncrementalRebalancingApp.class);
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">GROUP_ID</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;my-java-app-consumers&quot;</span>;
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">TOPIC</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;demo_java&quot;</span>;
+
+      <span class="hljs-comment">/**
+       * Kafka consumer configuration
+      */</span>
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Properties <span class="hljs-title function_">getKafkaConfig</span><span class="hljs-params">()</span> {
+
+          <span class="hljs-keyword">final</span> <span class="hljs-type">Properties</span> <span class="hljs-variable">properties</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();
+          properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="hljs-string">&quot;[::1]:9092&quot;</span>);
+          properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+          properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+
+          <span class="hljs-comment">// set application group id</span>
+          properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
+
+          <span class="hljs-comment">// Read config --&gt; earliest: Read from beginning</span>
+          properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, <span class="hljs-string">&quot;earliest&quot;</span>);
+
+          <span class="hljs-comment">// Don&#x27;t create topics if not found.</span>
+          properties.setProperty(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.toString(<span class="hljs-literal">false</span>));
+
+          <span class="hljs-comment">// CooperativeStickyAssignor : Incremental repartitioning</span>
+          properties.setProperty(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
+          <span class="hljs-keyword">return</span> properties;
+      }
+
+      <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+
+          logger.info(<span class="hljs-string">&quot;Execution started of main(...)&quot;</span>);
+
+          <span class="hljs-comment">// Create consumer</span>
+          KafkaConsumer&lt;String, String&gt; kafkaConsumer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KafkaConsumer</span>&lt;&gt;(getKafkaConfig());
+
+          <span class="hljs-comment">//Add shutdown hook to gracefully close the consumer</span>
+          <span class="hljs-keyword">final</span> <span class="hljs-type">Thread</span> <span class="hljs-variable">mainThread</span> <span class="hljs-operator">=</span> Thread.currentThread();
+          Runtime.getRuntime().addShutdownHook(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>() {
+              <span class="hljs-meta">@Override</span>
+              <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> {
+                  logger.info(<span class="hljs-string">&quot;Detected shutdown. calling to initiate shutdown.&quot;</span>);
+                  kafkaConsumer.wakeup();
+
+                  <span class="hljs-keyword">try</span> {
+                      mainThread.join();
+                  } <span class="hljs-keyword">catch</span> (InterruptedException e) {
+                      logger.error(<span class="hljs-string">&quot;Shutdown error while waiting for consumer to close resources. Message: {}&quot;</span>, e.getMessage());
+                      e.printStackTrace();
+                      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);
+                  }
+              }
+          });
+
+          <span class="hljs-keyword">try</span> {
+              <span class="hljs-comment">//subscribe</span>
+              kafkaConsumer.subscribe(List.of(TOPIC));
+
+              <span class="hljs-comment">// Poll for events</span>
+              <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+
+                  logger.info(<span class="hljs-string">&quot;Polling...&quot;</span>);
+                  <span class="hljs-comment">// The maximum time to block.</span>
+                  <span class="hljs-comment">// Must not be greater than Long.MAX_VALUE milliseconds.</span>
+                  <span class="hljs-keyword">final</span> ConsumerRecords&lt;String, String&gt; records = kafkaConsumer.poll(Duration.ofMillis(<span class="hljs-number">1000</span>));
+
+                  <span class="hljs-keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) {
+                      logger.info(<span class="hljs-string">&quot;Key: {}, Value: {}&quot;</span>, record.key(), record.value());
+                      logger.info(<span class="hljs-string">&quot;Partition: {}, Offset: {}&quot;</span>, record.partition(), record.offset());
+                  }
+              }
+          } <span class="hljs-keyword">catch</span> (WakeupException we) {
+              logger.info(<span class="hljs-string">&quot;Started shutdown for consumer.&quot;</span>);
+          } <span class="hljs-keyword">catch</span> (Exception e) {
+              logger.error(<span class="hljs-string">&quot;Unexpected error in consumer. Message: {}&quot;</span>, e.getMessage());
+              e.printStackTrace();
+          } <span class="hljs-keyword">finally</span> {
+              kafkaConsumer.close();
+              logger.info(<span class="hljs-string">&quot;Consumer is now gracefully shutdown.&quot;</span>);
+          }
+          logger.info(<span class="hljs-string">&quot;Execution completed of main(...)&quot;</span>);
+      }
+  }
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><ins>References:</ins></strong></p>
 <ul>
 <li><a href="https://www.redpanda.com/guides/kafka-performance-kafka-rebalancing">https://www.redpanda.com/guides/kafka-performance-kafka-rebalancing</a></li>
 </ul>
 </li>
 </ul>
 <hr>
+<h2 id="8-kafka-consumerauto-offset-commit-behavior">8. Kafka Consumer:Auto offset commit behavior</h2>
+<h3 id="project-ref-a4-kafka-consumer-2">Project ref: <a href="https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a4-kafka-consumer">a4-kafka-consumer</a></h3>
+<ul>
+<li><strong><ins>About / Introduction</ins></strong>
+<ul>
+<li>In Java consuer API, consumer offsets are regularly committed.</li>
+<li>Enable at-least once reading scenatio by default (under condition).
+<ul>
+<li>Offsets are committed when <em>poll(..)</em> API is called and <em><a href="http://auto.commit.interval.ms">auto.commit.interval.ms</a></em> has elapsed.</li>
+<li><strong>e.g.:</strong> <em>auto.commit.interval.ms=5000</em> and <em>enable.auto.commit=true</em> the it will commit every 5 seconds.</li>
+<li><strong>Note:</strong> Ensure all messages are processed before making <em>poll()</em> API call. Otherwise we'll not be in at-least once reading scenario.</li>
+</ul>
+</li>
+<li><strong>Manual offset commit:</strong> <em>(Advance)</em>
+<ul>
+<li>In order to commit manually.
+<ul>
+<li>Set <em>enable.auto.commit=false</em></li>
+<li>Set <em>auto.commit.interval.ms=5000</em></li>
+<li>Add custom logic to commit offset on a desired time-interval using <em>commitSync(..)</em> or <em>commitAsync(...)</em> APIs.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Commiting offsets:</strong><center>
+  <img src="./images/kafka-auto-commit-offset-async.png" alt="Kafka auto commit offset" title="Typical Kafka auto commit offset" width="500" height="250"/>
+</center>
+</li>
+</ul>
+</li>
+<li><strong>Code changes:</strong>
+<ul>
+<li><em><strong>Code:</strong></em> **<pre><code class="language-java">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KafkaConsumerManualOffsetCommitApp</span> {
+
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(KafkaConsumerIncrementalRebalancingApp.class);
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">GROUP_ID</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;my-java-app-consumers&quot;</span>;
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">TOPIC</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;demo_java&quot;</span>;
+
+      <span class="hljs-comment">/**
+       * Kafka consumer configuration
+      */</span>
+      <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Properties <span class="hljs-title function_">getKafkaConfig</span><span class="hljs-params">()</span> {
+
+          <span class="hljs-keyword">final</span> <span class="hljs-type">Properties</span> <span class="hljs-variable">properties</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();
+          properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="hljs-string">&quot;[::1]:9092&quot;</span>);
+          properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+          properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+
+          <span class="hljs-comment">// set application group id</span>
+          properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
+
+          <span class="hljs-comment">// Read config --&gt; earliest: Read from beginning</span>
+          properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, <span class="hljs-string">&quot;earliest&quot;</span>);
+
+          <span class="hljs-comment">// Don&#x27;t create topics if not found.</span>
+          properties.setProperty(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.toString(<span class="hljs-literal">false</span>));
+
+          <span class="hljs-comment">// CooperativeStickyAssignor : Incremental repartitioning</span>
+          properties.setProperty(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
+
+          <span class="hljs-comment">// Auto commit interval ms</span>
+          properties.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, <span class="hljs-string">&quot;5000&quot;</span>);
+
+          <span class="hljs-comment">// disable auto commit for offset</span>
+          properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.toString(Boolean.FALSE));
+
+          <span class="hljs-keyword">return</span> properties;
+      }
+
+      <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+
+          logger.info(<span class="hljs-string">&quot;Execution started of main(...)&quot;</span>);
+
+          <span class="hljs-comment">// Create consumer</span>
+          KafkaConsumer&lt;String, String&gt; kafkaConsumer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KafkaConsumer</span>&lt;&gt;(getKafkaConfig());
+
+          <span class="hljs-comment">//Add shutdown hook to gracefully close the consumer</span>
+          <span class="hljs-keyword">final</span> <span class="hljs-type">Thread</span> <span class="hljs-variable">mainThread</span> <span class="hljs-operator">=</span> Thread.currentThread();
+          Runtime.getRuntime().addShutdownHook(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>() {
+              <span class="hljs-meta">@Override</span>
+              <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> {
+                  logger.info(<span class="hljs-string">&quot;Detected shutdown. calling to initiate shutdown.&quot;</span>);
+                  kafkaConsumer.wakeup();
+
+                  <span class="hljs-keyword">try</span> {
+                      mainThread.join();
+                  } <span class="hljs-keyword">catch</span> (InterruptedException e) {
+                      logger.error(<span class="hljs-string">&quot;Shutdown error while waiting for consumer to close resources. Message: {}&quot;</span>, e.getMessage());
+                      e.printStackTrace();
+                      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);
+                  }
+              }
+          });
+
+          <span class="hljs-keyword">try</span> {
+              <span class="hljs-comment">//subscribe</span>
+              kafkaConsumer.subscribe(List.of(TOPIC));
+
+              <span class="hljs-comment">// Poll for events</span>
+              <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+
+                  logger.info(<span class="hljs-string">&quot;Polling.................&quot;</span>);
+                  <span class="hljs-comment">// The maximum time to block.</span>
+                  <span class="hljs-comment">// Must not be greater than Long.MAX_VALUE milliseconds.</span>
+                  <span class="hljs-keyword">final</span> ConsumerRecords&lt;String, String&gt; records = kafkaConsumer.poll(Duration.ofMillis(<span class="hljs-number">1000</span>));
+
+                  <span class="hljs-keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records) {
+                      logger.info(<span class="hljs-string">&quot;Key: {}, Value: {}&quot;</span>, record.key(), record.value());
+                      logger.info(<span class="hljs-string">&quot;Partition: {}, Offset: {}&quot;</span>, record.partition(), record.offset());
+                  }
+
+                  <span class="hljs-comment">// Manual commit async</span>
+                  kafkaConsumer.commitAsync();
+              }
+          } <span class="hljs-keyword">catch</span> (WakeupException we) {
+              logger.info(<span class="hljs-string">&quot;Started shutdown for consumer.&quot;</span>);
+          } <span class="hljs-keyword">catch</span> (Exception e) {
+              logger.error(<span class="hljs-string">&quot;Unexpected error in consumer. Message: {}&quot;</span>, e.getMessage());
+              e.printStackTrace();
+          } <span class="hljs-keyword">finally</span> {
+              kafkaConsumer.close();
+              logger.info(<span class="hljs-string">&quot;Consumer is now gracefully shutdown.&quot;</span>);
+          }
+          logger.info(<span class="hljs-string">&quot;Execution completed of main(...)&quot;</span>);
+      }
+  }
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="-------------------------------------------------end-------------------------------------------------">------------------------------------------------ END ------------------------------------------------</h2>
 
             
             

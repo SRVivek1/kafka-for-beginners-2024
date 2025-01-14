@@ -374,53 +374,46 @@
   - ***Step-1:*** Update *ProducerRecord* to include *key* along with *message* & *topic name*.
     - *ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, key, message)*
 - **App:** *KafkaProducerRecordWithKeys.java*
-      ```java
-          public class KafkaProducerRecordWithKeys {
-            private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecordWithKeys.class);
-
-            public static void main(String[] args) {
-                logger.info("Execution started for main(...)");
-
-                final Properties properties = new Properties();
-                properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
-                properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-                properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-
-                final KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
-
-                final String TOPIC = "demo_java";
-                // Send data
-                for (int j = 0; j < 10; j++) {
-                    for (int i = 0; i < 10; i++) {
-
-                        String key = "id_" + i;
-                        String message = "hello world - " + i;
-
-                        producer.send(new ProducerRecord<>(TOPIC, key, message), new Callback() {
-                            @Override
-                            public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-
-                                if (e == null) {
-                                    logger.info("Record: Key: {}, Partition: {}", key, recordMetadata.partition());
-                                } else {
-                                    logger.error("Stacktrace:\n{}", e.getStackTrace());
-                                }
-                            }
-                        });
-                        producer.flush();
-                    }
-                    // sleep thead to create bataches
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                producer.close();
-                logger.info("Execution completed for main(...)");
-            }
-        }
-      ```
+  ```java
+     public class KafkaProducerRecordWithKeys {
+       private static final Logger logger = LoggerFactory.getLogger(KafkaProducerRecordWithKeys.class);
+       public static void main(String[] args) {
+           logger.info("Execution started for main(...)");
+           final Properties properties = new Properties();
+           properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
+           properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+           properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+           final KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+           final String TOPIC = "demo_java";
+           // Send data
+           for (int j = 0; j < 10; j++) {
+               for (int i = 0; i < 10; i++) {
+                   String key = "id_" + i;
+                   String message = "hello world - " + i;
+                   producer.send(new ProducerRecord<>(TOPIC, key, message), new Callback() {
+                       @Override
+                       public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                           if (e == null) {
+                               logger.info("Record: Key: {}, Partition: {}", key, recordMetadata.partition());
+                           } else {
+                               logger.error("Stacktrace:\n{}", e.getStackTrace());
+                           }
+                       }
+                   });
+                   producer.flush();
+               }
+               // sleep thead to create bataches
+               try {
+                   Thread.sleep(1000);
+               } catch (InterruptedException e) {
+                   throw new RuntimeException(e);
+               }
+           }
+           producer.close();
+           logger.info("Execution completed for main(...)");
+       }
+   }
+  ```
 - **<ins>References:</ins>**
   - [https://www.geeksforgeeks.org/apache-kafka-message-keys/](https://www.geeksforgeeks.org/apache-kafka-message-keys/)
 
@@ -475,11 +468,13 @@
 - **<ins>Code </ins>**
   - **Consumer:** *KafkaConsumerApp.java*
     - imports
-      - *import org.apache.kafka.clients.consumer.ConsumerConfig;*
-      - *import org.apache.kafka.clients.consumer.ConsumerRecord;*
-      - *import org.apache.kafka.clients.consumer.ConsumerRecords;*
-      - *import org.apache.kafka.clients.consumer.KafkaConsumer;*
-      - *import org.apache.kafka.common.errors.WakeupException;*
+      ```java
+          import org.apache.kafka.clients.consumer.ConsumerConfig;
+          import org.apache.kafka.clients.consumer.ConsumerRecord;
+          import org.apache.kafka.clients.consumer.ConsumerRecords;
+          import org.apache.kafka.clients.consumer.KafkaConsumer;
+          import org.apache.kafka.common.errors.WakeupException;
+      ```
     - Kafka Consumer class to poll messages from kafka.
     	```java
           public class KafkaConsumerApp {
@@ -574,13 +569,16 @@
   - [https://docs.confluent.io/platform/current/clients/consumer.html](https://docs.confluent.io/platform/current/clients/consumer.html)
 ---
 
-## 7. Consumer group and rebalancing
+## 7. Kafka Consumer group and partition rebalancing
+### Project ref: [a4-kafka-consumer](https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a4-kafka-consumer)
 - **<ins>About / Introduction</ins>**
   - The concept of rebalancing is fundamental to Kafka's consumer group architecture. When a consumer group is created, the group coordinator assigns partitions to each consumer in the group. Each consumer is responsible for consuming data from its assigned partitions. 
   - However, as consumers join or leave the group or new partitions are added to a topic, the partition assignments become unbalanced. This is where rebalancing comes into play.
     - Kafka rebalancing is the process by which Kafka redistributes partitions across consumers to ensure that each consumer is processing an approximately equal number of partitions. 
     - This ensures that data processing is distributed evenly across consumers and that each consumer is processing data as efficiently as possible. 
     - As a result, Kafka can scale efficiently and effectively, preventing any single consumer from becoming overloaded or underused.
+    - Kafka default strategy uses ["o.a.k.c.consumer.RangeAssignor, "o.a.k.c.consumer.CooperativeStickyAssignor"].
+      - *RangeAssignor* has priority over other.
   - **Rebalacing:**
     - ***Eager Rebalance***
       - All consumers are stopped and giveup their membership of partitions.
@@ -595,7 +593,7 @@
             - Assigns partitions across all topics in round-robin fashion (optimal balance).
           - *StickyAssignor:*
             - Balanced like *RoundRobin* and minimizes parition movements when consumer joins or leaves the group.
-    - ***Cooperative (Incremental) Rebalance:***
+    - ***Cooperative (Incremental) Rebalance:*** - *Recommended*
       - Incremental cooperative rebalance protocol was introduced in Kafka 2.4 to minimize the disruption caused by Kafka rebalancing.
       - In this strategy rebalancing is split into smaller sub-tasks, and consumers continue consuming data while these sub-tasks are completed. As a result, rebalancing occurs more quickly and with less interruption to data processing.
       - It can go through several itertions to find a stable assignment (hence incremental).
@@ -651,14 +649,218 @@
     - **How to use ?:**
       - Set the configuration *group.instance.id* to make a consumer a static member. 
       - The same partition will be assigned to consumer if it rejoins before the session timeout *session.timeout.ms*.
+
+- **Code changes**
+  - ***Imports:***
+    - *import org.apache.kafka.clients.consumer.CooperativeStickyAssignor;*
+  - ***Consumer app: *** **
+    ```java
+        public class KafkaConsumerIncrementalRebalancingApp {
+
+          private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerIncrementalRebalancingApp.class);
+          private static final String GROUP_ID = "my-java-app-consumers";
+          private static final String TOPIC = "demo_java";
+
+          /**
+           * Kafka consumer configuration
+          */
+          private static Properties getKafkaConfig() {
+
+              final Properties properties = new Properties();
+              properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
+              properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+              properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+
+              // set application group id
+              properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
+
+              // Read config --> earliest: Read from beginning
+              properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+              // Don't create topics if not found.
+              properties.setProperty(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.toString(false));
+
+              // CooperativeStickyAssignor : Incremental repartitioning
+              properties.setProperty(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
+              return properties;
+          }
+
+          public static void main(String[] args) {
+
+              logger.info("Execution started of main(...)");
+
+              // Create consumer
+              KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(getKafkaConfig());
+
+              //Add shutdown hook to gracefully close the consumer
+              final Thread mainThread = Thread.currentThread();
+              Runtime.getRuntime().addShutdownHook(new Thread() {
+                  @Override
+                  public void run() {
+                      logger.info("Detected shutdown. calling to initiate shutdown.");
+                      kafkaConsumer.wakeup();
+
+                      try {
+                          mainThread.join();
+                      } catch (InterruptedException e) {
+                          logger.error("Shutdown error while waiting for consumer to close resources. Message: {}", e.getMessage());
+                          e.printStackTrace();
+                          throw new RuntimeException(e);
+                      }
+                  }
+              });
+
+              try {
+                  //subscribe
+                  kafkaConsumer.subscribe(List.of(TOPIC));
+
+                  // Poll for events
+                  while (true) {
+
+                      logger.info("Polling...");
+                      // The maximum time to block.
+                      // Must not be greater than Long.MAX_VALUE milliseconds.
+                      final ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
+
+                      for (ConsumerRecord<String, String> record : records) {
+                          logger.info("Key: {}, Value: {}", record.key(), record.value());
+                          logger.info("Partition: {}, Offset: {}", record.partition(), record.offset());
+                      }
+                  }
+              } catch (WakeupException we) {
+                  logger.info("Started shutdown for consumer.");
+              } catch (Exception e) {
+                  logger.error("Unexpected error in consumer. Message: {}", e.getMessage());
+                  e.printStackTrace();
+              } finally {
+                  kafkaConsumer.close();
+                  logger.info("Consumer is now gracefully shutdown.");
+              }
+              logger.info("Execution completed of main(...)");
+          }
+      }
+    
+    ```
 - **<ins>References:</ins>**
   - [https://www.redpanda.com/guides/kafka-performance-kafka-rebalancing](https://www.redpanda.com/guides/kafka-performance-kafka-rebalancing)
 
 ---
 
+## 8. Kafka Consumer:Auto offset commit behavior
+### Project ref: [a4-kafka-consumer](https://github.com/SRVivek1/kafka-for-beginners-2024/tree/main/03-kafka-beginners-gradle/a4-kafka-consumer)
+- **<ins>About / Introduction</ins>**
+  - In Java consuer API, consumer offsets are regularly committed.
+  - Enable at-least once reading scenatio by default (under condition).
+    - Offsets are committed when *poll(..)* API is called and *auto.commit.interval.ms* has elapsed.
+    - **e.g.:** *auto.commit.interval.ms=5000* and *enable.auto.commit=true* the it will commit every 5 seconds.
+    - **Note:** Ensure all messages are processed before making *poll()* API call. Otherwise we'll not be in at-least once reading scenario.
+  - **Manual offset commit:** *(Advance)*
+    - In order to commit manually.
+      - Set *enable.auto.commit=false*
+      - Set *auto.commit.interval.ms=5000*
+      - Add custom logic to commit offset on a desired time-interval using *commitSync(..)* or *commitAsync(...)* APIs.
+  - **Commiting offsets:**
+    <center>
+      <img src="./images/kafka-auto-commit-offset-async.png" alt="Kafka auto commit offset" title="Typical Kafka auto commit offset" width="500" height="250"/>
+    </center>
+- **Code changes:**
+  - ***Code:*** **
+    ```java
+        public class KafkaConsumerManualOffsetCommitApp {
 
+          private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerIncrementalRebalancingApp.class);
+          private static final String GROUP_ID = "my-java-app-consumers";
+          private static final String TOPIC = "demo_java";
 
+          /**
+           * Kafka consumer configuration
+          */
+          private static Properties getKafkaConfig() {
 
+              final Properties properties = new Properties();
+              properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
+              properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+              properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
 
+              // set application group id
+              properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
 
+              // Read config --> earliest: Read from beginning
+              properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
+              // Don't create topics if not found.
+              properties.setProperty(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, Boolean.toString(false));
+
+              // CooperativeStickyAssignor : Incremental repartitioning
+              properties.setProperty(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
+
+              // Auto commit interval ms
+              properties.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "5000");
+
+              // disable auto commit for offset
+              properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.toString(Boolean.FALSE));
+
+              return properties;
+          }
+
+          public static void main(String[] args) {
+
+              logger.info("Execution started of main(...)");
+
+              // Create consumer
+              KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(getKafkaConfig());
+
+              //Add shutdown hook to gracefully close the consumer
+              final Thread mainThread = Thread.currentThread();
+              Runtime.getRuntime().addShutdownHook(new Thread() {
+                  @Override
+                  public void run() {
+                      logger.info("Detected shutdown. calling to initiate shutdown.");
+                      kafkaConsumer.wakeup();
+
+                      try {
+                          mainThread.join();
+                      } catch (InterruptedException e) {
+                          logger.error("Shutdown error while waiting for consumer to close resources. Message: {}", e.getMessage());
+                          e.printStackTrace();
+                          throw new RuntimeException(e);
+                      }
+                  }
+              });
+
+              try {
+                  //subscribe
+                  kafkaConsumer.subscribe(List.of(TOPIC));
+
+                  // Poll for events
+                  while (true) {
+
+                      logger.info("Polling.................");
+                      // The maximum time to block.
+                      // Must not be greater than Long.MAX_VALUE milliseconds.
+                      final ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(1000));
+
+                      for (ConsumerRecord<String, String> record : records) {
+                          logger.info("Key: {}, Value: {}", record.key(), record.value());
+                          logger.info("Partition: {}, Offset: {}", record.partition(), record.offset());
+                      }
+
+                      // Manual commit async
+                      kafkaConsumer.commitAsync();
+                  }
+              } catch (WakeupException we) {
+                  logger.info("Started shutdown for consumer.");
+              } catch (Exception e) {
+                  logger.error("Unexpected error in consumer. Message: {}", e.getMessage());
+                  e.printStackTrace();
+              } finally {
+                  kafkaConsumer.close();
+                  logger.info("Consumer is now gracefully shutdown.");
+              }
+              logger.info("Execution completed of main(...)");
+          }
+      }
+    ```
+---
+------------------------------------------------ END ------------------------------------------------
+---
