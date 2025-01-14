@@ -104,47 +104,11 @@
           - It means that the data is sent without a key. Thus, it will be distributed in a round-robin manner (i.e., distributed to each partition).
         - ***If the value of the key!=NULL:***
           - It means the key is attached with the data, and thus all messages will always be delivered to the same partition (Hashing).
-      - Typical message in kafka:
-        <table style="border: 1px solid black">
-          <tr>
-            <td>
-              Key-Binary <br/>
-              (can be null)
-              </td>
-            <td>
-              Value-Binary <br/>
-              (can be null)
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              Compression type <br/> 
-              (none, gzip, snappy, lz4, zstd)
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              Headers (Optional) <br/> 
-              <p> 
-              |-----------------| <br/>
-              | Key &nbsp;&nbsp;| value &nbsp;&nbsp; |<br/>
-              |-----------------| <br/>
-              | Key &nbsp;&nbsp;| value &nbsp;&nbsp; |<br/>
-              |-----------------| <br/>
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              Partition + Offset
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              Timestamp (System or user set)
-            </td>
-          </tr>
-        </table>
+      - **Kafka Message Structure:**
+          <br/>
+          <left>
+            <img src="./images/kafka-message-structure.png" alt="kafka message structure" title="Kafka Message Structure / Components" width="600" height="250"/>
+          </left>
     - **Acknowledgment:**
       - In this strategy, the producer can get a confirmation of its data writes by receiving the following acknowledgments:
         - ***acks=0:*** 
