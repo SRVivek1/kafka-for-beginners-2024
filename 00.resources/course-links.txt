@@ -1,6 +1,7 @@
 Course Code:
 -------------
-    --> https://conduktor.io/apache-kafka-for-beginners
+    --> Beginners: https://conduktor.io/apache-kafka-for-beginners
+    --> Advance: https://learn.conduktor.io/kafka/advanced-kafka-consumer-with-java/
 
 
 First part of the code:
@@ -24,4 +25,10 @@ Kafak getting started
    --> https://learn.conduktor.io/kafka/how-to-start-kafka-with-conduktor/
    --> https://learn.conduktor.io/kafka/how-to-install-apache-kafka-on-linux/
 
-   
+
+
+Wikimedia Streams API
+------------------------------
+    --> https://stream.wikimedia.org/v2/ui/#/?streams=recentchange
+    --> https://opensearch.org/
+    
